@@ -1,0 +1,195 @@
+meta {
+  name: Create Pages Mov
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/pages/:page_id/move
+  body: json
+  auth: inherit
+}
+
+params:path {
+  page_id: 
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+body:json {
+  {
+    "parent": {}
+  }
+}
+
+example {
+  name: moved (move)
+  
+  request: {
+    url: {{baseUrl}}/pages/:page_id/move
+    method: POST
+    mode: json
+    params:path: {
+      page_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "parent": {
+          "type": "page_id",
+          "page_id": "01da9b00-e400-4959-91ce-af55307647e5"
+        }
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "page",
+          "id": "01da9b00-e400-4959-91ce-af55307647e5",
+          "created_time": "2023-01-01T00:00:00.000Z",
+          "last_edited_time": "2023-01-01T00:00:00.000Z",
+          "archived": false,
+          "properties": {
+            "title": {
+              "title": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "Page Title"
+                  },
+                  "plain_text": "Page Title"
+                }
+              ]
+            }
+          },
+          "parent": {
+            "type": "database_id",
+            "database_id": "01da9b00-e400-4959-91ce-af55307647e5"
+          },
+          "url": "https://www.notion.so/Page-Title-01da9b00e40049"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest (move)
+  
+  request: {
+    url: {{baseUrl}}/pages/:page_id/move
+    method: POST
+    mode: json
+    params:path: {
+      page_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "parent": {
+          "type": "page_id",
+          "page_id": "01da9b00-e400-4959-91ce-af55307647e5"
+        }
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: notFound (move)
+  
+  request: {
+    url: {{baseUrl}}/pages/:page_id/move
+    method: POST
+    mode: json
+    params:path: {
+      page_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "parent": {
+          "type": "page_id",
+          "page_id": "01da9b00-e400-4959-91ce-af55307647e5"
+        }
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 404,
+          "code": "object_not_found",
+          "message": "Could not find the requested resource"
+        }
+      '''
+    }
+  }
+}

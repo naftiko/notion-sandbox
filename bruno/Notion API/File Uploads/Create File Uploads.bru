@@ -1,0 +1,585 @@
+meta {
+  name: Create File Uploads
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/file_uploads
+  body: json
+  auth: inherit
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+body:json {
+  {
+    "filename": "",
+    "file_size_bytes": 0,
+    "mime_type": "",
+    "part_size_bytes": 0
+  }
+}
+
+example {
+  name: Single-part upload created (Create single-part image upload)
+  
+  request: {
+    url: {{baseUrl}}/file_uploads
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "filename": "company-logo.png",
+        "file_size_bytes": 1048576,
+        "mime_type": "image/png"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "file_upload",
+          "id": "550e8400-e29b-41d4-a716-446655440000",
+          "filename": "company-logo.png",
+          "file_size_bytes": 1048576,
+          "mime_type": "image/png",
+          "status": "pending",
+          "created_time": "2025-01-15T10:30:00.000Z"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Single-part upload created (Create multi-part video upload)
+  
+  request: {
+    url: {{baseUrl}}/file_uploads
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "filename": "product-demo.mp4",
+        "file_size_bytes": 52428800,
+        "mime_type": "video/mp4",
+        "part_size_bytes": 10485760
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "file_upload",
+          "id": "550e8400-e29b-41d4-a716-446655440000",
+          "filename": "company-logo.png",
+          "file_size_bytes": 1048576,
+          "mime_type": "image/png",
+          "status": "pending",
+          "created_time": "2025-01-15T10:30:00.000Z"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Multi-part upload created (Create single-part image upload)
+  
+  request: {
+    url: {{baseUrl}}/file_uploads
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "filename": "company-logo.png",
+        "file_size_bytes": 1048576,
+        "mime_type": "image/png"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "file_upload",
+          "id": "660e8400-e29b-41d4-a716-446655440001",
+          "filename": "product-demo.mp4",
+          "file_size_bytes": 52428800,
+          "mime_type": "video/mp4",
+          "status": "pending",
+          "created_time": "2025-01-15T10:30:00.000Z"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Multi-part upload created (Create multi-part video upload)
+  
+  request: {
+    url: {{baseUrl}}/file_uploads
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "filename": "product-demo.mp4",
+        "file_size_bytes": 52428800,
+        "mime_type": "video/mp4",
+        "part_size_bytes": 10485760
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "file_upload",
+          "id": "660e8400-e29b-41d4-a716-446655440001",
+          "filename": "product-demo.mp4",
+          "file_size_bytes": 52428800,
+          "mime_type": "video/mp4",
+          "status": "pending",
+          "created_time": "2025-01-15T10:30:00.000Z"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest (Create single-part image upload)
+  
+  request: {
+    url: {{baseUrl}}/file_uploads
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "filename": "company-logo.png",
+        "file_size_bytes": 1048576,
+        "mime_type": "image/png"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest (Create multi-part video upload)
+  
+  request: {
+    url: {{baseUrl}}/file_uploads
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "filename": "product-demo.mp4",
+        "file_size_bytes": 52428800,
+        "mime_type": "video/mp4",
+        "part_size_bytes": 10485760
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: unauthorized (Create single-part image upload)
+  
+  request: {
+    url: {{baseUrl}}/file_uploads
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "filename": "company-logo.png",
+        "file_size_bytes": 1048576,
+        "mime_type": "image/png"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 401,
+          "code": "unauthorized",
+          "message": "API token is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: unauthorized (Create multi-part video upload)
+  
+  request: {
+    url: {{baseUrl}}/file_uploads
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "filename": "product-demo.mp4",
+        "file_size_bytes": 52428800,
+        "mime_type": "video/mp4",
+        "part_size_bytes": 10485760
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 401,
+          "code": "unauthorized",
+          "message": "API token is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: restrictedResource (Create single-part image upload)
+  
+  request: {
+    url: {{baseUrl}}/file_uploads
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "filename": "company-logo.png",
+        "file_size_bytes": 1048576,
+        "mime_type": "image/png"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 403,
+          "code": "restricted_resource",
+          "message": "Access to this resource is restricted"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: restrictedResource (Create multi-part video upload)
+  
+  request: {
+    url: {{baseUrl}}/file_uploads
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "filename": "product-demo.mp4",
+        "file_size_bytes": 52428800,
+        "mime_type": "video/mp4",
+        "part_size_bytes": 10485760
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 403,
+          "code": "restricted_resource",
+          "message": "Access to this resource is restricted"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 429 Response (Create single-part image upload)
+  description: Rate limit exceeded
+  
+  request: {
+    url: {{baseUrl}}/file_uploads
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "filename": "company-logo.png",
+        "file_size_bytes": 1048576,
+        "mime_type": "image/png"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 429,
+          "code": "rate_limited",
+          "message": "Too many requests. Please try again later."
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 429 Response (Create multi-part video upload)
+  description: Rate limit exceeded
+  
+  request: {
+    url: {{baseUrl}}/file_uploads
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "filename": "product-demo.mp4",
+        "file_size_bytes": 52428800,
+        "mime_type": "video/mp4",
+        "part_size_bytes": 10485760
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 429,
+          "code": "rate_limited",
+          "message": "Too many requests. Please try again later."
+        }
+      '''
+    }
+  }
+}

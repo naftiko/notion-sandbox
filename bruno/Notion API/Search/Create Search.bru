@@ -1,0 +1,852 @@
+meta {
+  name: Create Search
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/search
+  body: json
+  auth: inherit
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+body:json {
+  {
+    "query": "aaaa",
+    "filter": {
+      "value": "",
+      "property": ""
+    },
+    "sort": {
+      "direction": "",
+      "timestamp": ""
+    },
+    "start_cursor": "",
+    "page_size": 0
+  }
+}
+
+example {
+  name: searchResults (searchAll)
+  
+  request: {
+    url: {{baseUrl}}/search
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "list",
+          "results": [
+            {
+              "object": "page",
+              "id": "59833787-2cf9-4fdf-8782-e53db20768a5",
+              "properties": {
+                "title": {
+                  "title": [
+                    {
+                      "text": {
+                        "content": "Meeting Notes"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "object": "database",
+              "id": "668d797c-76fa-4934-9b05-ad288df2d136",
+              "title": [
+                {
+                  "text": {
+                    "content": "Projects Database"
+                  }
+                }
+              ]
+            }
+          ],
+          "has_more": false,
+          "next_cursor": null,
+          "type": "page_or_database"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: searchResults (searchByQuery)
+  
+  request: {
+    url: {{baseUrl}}/search
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "query": "meeting notes"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "list",
+          "results": [
+            {
+              "object": "page",
+              "id": "59833787-2cf9-4fdf-8782-e53db20768a5",
+              "properties": {
+                "title": {
+                  "title": [
+                    {
+                      "text": {
+                        "content": "Meeting Notes"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "object": "database",
+              "id": "668d797c-76fa-4934-9b05-ad288df2d136",
+              "title": [
+                {
+                  "text": {
+                    "content": "Projects Database"
+                  }
+                }
+              ]
+            }
+          ],
+          "has_more": false,
+          "next_cursor": null,
+          "type": "page_or_database"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: searchResults (searchPagesOnly)
+  
+  request: {
+    url: {{baseUrl}}/search
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "filter": {
+          "value": "page",
+          "property": "object"
+        }
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "list",
+          "results": [
+            {
+              "object": "page",
+              "id": "59833787-2cf9-4fdf-8782-e53db20768a5",
+              "properties": {
+                "title": {
+                  "title": [
+                    {
+                      "text": {
+                        "content": "Meeting Notes"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "object": "database",
+              "id": "668d797c-76fa-4934-9b05-ad288df2d136",
+              "title": [
+                {
+                  "text": {
+                    "content": "Projects Database"
+                  }
+                }
+              ]
+            }
+          ],
+          "has_more": false,
+          "next_cursor": null,
+          "type": "page_or_database"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: searchResults (searchWithSort)
+  
+  request: {
+    url: {{baseUrl}}/search
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "query": "project",
+        "sort": {
+          "direction": "descending",
+          "timestamp": "last_edited_time"
+        }
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "list",
+          "results": [
+            {
+              "object": "page",
+              "id": "59833787-2cf9-4fdf-8782-e53db20768a5",
+              "properties": {
+                "title": {
+                  "title": [
+                    {
+                      "text": {
+                        "content": "Meeting Notes"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "object": "database",
+              "id": "668d797c-76fa-4934-9b05-ad288df2d136",
+              "title": [
+                {
+                  "text": {
+                    "content": "Projects Database"
+                  }
+                }
+              ]
+            }
+          ],
+          "has_more": false,
+          "next_cursor": null,
+          "type": "page_or_database"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest (searchAll)
+  
+  request: {
+    url: {{baseUrl}}/search
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest (searchByQuery)
+  
+  request: {
+    url: {{baseUrl}}/search
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "query": "meeting notes"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest (searchPagesOnly)
+  
+  request: {
+    url: {{baseUrl}}/search
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "filter": {
+          "value": "page",
+          "property": "object"
+        }
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest (searchWithSort)
+  
+  request: {
+    url: {{baseUrl}}/search
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "query": "project",
+        "sort": {
+          "direction": "descending",
+          "timestamp": "last_edited_time"
+        }
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: unauthorized (searchAll)
+  
+  request: {
+    url: {{baseUrl}}/search
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 401,
+          "code": "unauthorized",
+          "message": "API token is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: unauthorized (searchByQuery)
+  
+  request: {
+    url: {{baseUrl}}/search
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "query": "meeting notes"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 401,
+          "code": "unauthorized",
+          "message": "API token is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: unauthorized (searchPagesOnly)
+  
+  request: {
+    url: {{baseUrl}}/search
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "filter": {
+          "value": "page",
+          "property": "object"
+        }
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 401,
+          "code": "unauthorized",
+          "message": "API token is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: unauthorized (searchWithSort)
+  
+  request: {
+    url: {{baseUrl}}/search
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "query": "project",
+        "sort": {
+          "direction": "descending",
+          "timestamp": "last_edited_time"
+        }
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 401,
+          "code": "unauthorized",
+          "message": "API token is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: rateLimited (searchAll)
+  
+  request: {
+    url: {{baseUrl}}/search
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 429,
+          "code": "rate_limited",
+          "message": "Rate limit exceeded"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: rateLimited (searchByQuery)
+  
+  request: {
+    url: {{baseUrl}}/search
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "query": "meeting notes"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 429,
+          "code": "rate_limited",
+          "message": "Rate limit exceeded"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: rateLimited (searchPagesOnly)
+  
+  request: {
+    url: {{baseUrl}}/search
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "filter": {
+          "value": "page",
+          "property": "object"
+        }
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 429,
+          "code": "rate_limited",
+          "message": "Rate limit exceeded"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: rateLimited (searchWithSort)
+  
+  request: {
+    url: {{baseUrl}}/search
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "query": "project",
+        "sort": {
+          "direction": "descending",
+          "timestamp": "last_edited_time"
+        }
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 429,
+          "code": "rate_limited",
+          "message": "Rate limit exceeded"
+        }
+      '''
+    }
+  }
+}

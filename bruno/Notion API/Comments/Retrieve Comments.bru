@@ -1,0 +1,208 @@
+meta {
+  name: Retrieve Comments
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/comments
+  body: none
+  auth: inherit
+}
+
+params:query {
+  block_id: 
+  ~page_size: 
+  ~start_cursor: 
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+example {
+  name: comments
+  
+  request: {
+    url: {{baseUrl}}/comments
+    method: GET
+    mode: none
+    params:query: {
+      block_id: 
+      ~page_size: 
+      ~start_cursor: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "list",
+          "results": [
+            {
+              "object": "comment",
+              "id": "3c612f3a-f070-4f84-93aa-4f2f4e111111",
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "First comment"
+                  }
+                }
+              ]
+            }
+          ],
+          "has_more": false,
+          "next_cursor": null,
+          "type": "comment"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest
+  
+  request: {
+    url: {{baseUrl}}/comments
+    method: GET
+    mode: none
+    params:query: {
+      block_id: 
+      ~page_size: 
+      ~start_cursor: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: unauthorized
+  
+  request: {
+    url: {{baseUrl}}/comments
+    method: GET
+    mode: none
+    params:query: {
+      block_id: 
+      ~page_size: 
+      ~start_cursor: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 401,
+          "code": "unauthorized",
+          "message": "API token is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: rateLimited
+  
+  request: {
+    url: {{baseUrl}}/comments
+    method: GET
+    mode: none
+    params:query: {
+      block_id: 
+      ~page_size: 
+      ~start_cursor: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 429,
+          "code": "rate_limited",
+          "message": "Rate limit exceeded"
+        }
+      '''
+    }
+  }
+}

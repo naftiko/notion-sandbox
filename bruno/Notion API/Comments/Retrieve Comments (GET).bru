@@ -1,0 +1,111 @@
+meta {
+  name: Retrieve Comments (GET)
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/comments/:comment_id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  comment_id: 
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+example {
+  name: comment
+  
+  request: {
+    url: {{baseUrl}}/comments/:comment_id
+    method: GET
+    mode: none
+    params:path: {
+      comment_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "comment",
+          "id": "01da9b00-e400-4959-91ce-af55307647e5",
+          "created_time": "2023-01-01T00:00:00.000Z",
+          "last_edited_time": "2023-01-01T00:00:00.000Z",
+          "rich_text": [
+            {
+              "type": "text",
+              "text": {
+                "content": "This is a comment"
+              },
+              "plain_text": "This is a comment"
+            }
+          ]
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: notFound
+  
+  request: {
+    url: {{baseUrl}}/comments/:comment_id
+    method: GET
+    mode: none
+    params:path: {
+      comment_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 404,
+          "code": "object_not_found",
+          "message": "Could not find the requested resource"
+        }
+      '''
+    }
+  }
+}

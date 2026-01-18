@@ -1,0 +1,172 @@
+meta {
+  name: Patch Datasources
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{baseUrl}}/datasources/:datasource_id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  datasource_id: 
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+body:json {
+  {
+    "name": "",
+    "properties": {}
+  }
+}
+
+example {
+  name: updated (update)
+  
+  request: {
+    url: {{baseUrl}}/datasources/:datasource_id
+    method: PATCH
+    mode: json
+    params:path: {
+      datasource_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "name": "Updated Data Source"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "datasource",
+          "id": "01da9b00-e400-4959-91ce-af55307647e5",
+          "name": "My Data Source",
+          "properties": {
+            "field1": {
+              "type": "text"
+            }
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest (update)
+  
+  request: {
+    url: {{baseUrl}}/datasources/:datasource_id
+    method: PATCH
+    mode: json
+    params:path: {
+      datasource_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "name": "Updated Data Source"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: notFound (update)
+  
+  request: {
+    url: {{baseUrl}}/datasources/:datasource_id
+    method: PATCH
+    mode: json
+    params:path: {
+      datasource_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "name": "Updated Data Source"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 404,
+          "code": "object_not_found",
+          "message": "Could not find the requested resource"
+        }
+      '''
+    }
+  }
+}

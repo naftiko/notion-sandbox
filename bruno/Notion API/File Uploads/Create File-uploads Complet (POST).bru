@@ -1,0 +1,125 @@
+meta {
+  name: Create File-uploads Complet (POST)
+  type: http
+  seq: 32
+}
+
+post {
+  url: {{baseUrl}}/file-uploads/:upload_id/complete
+  body: json
+  auth: inherit
+}
+
+params:path {
+  upload_id: 2343
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+body:json {
+  {
+    "checksum": ""
+  }
+}
+
+example {
+  name: completed (complete)
+  
+  request: {
+    url: {{baseUrl}}/file-uploads/:upload_id/complete
+    method: POST
+    mode: json
+    params:path: {
+      upload_id: 2343
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "checksum": "abc123"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "file_upload",
+          "id": "01da9b00-e400-4959-91ce-af55307647e5",
+          "status": "completed",
+          "file": {
+            "type": "file",
+            "file": {
+              "url": "https://example.com/file.pdf"
+            }
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest (complete)
+  
+  request: {
+    url: {{baseUrl}}/file-uploads/:upload_id/complete
+    method: POST
+    mode: json
+    params:path: {
+      upload_id: 2343
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "checksum": "abc123"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}

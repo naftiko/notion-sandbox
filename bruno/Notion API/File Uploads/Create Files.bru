@@ -1,0 +1,389 @@
+meta {
+  name: Create Files
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/files
+  body: json
+  auth: inherit
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+body:json {
+  {
+    "filename": "",
+    "file_size_bytes": 0,
+    "mime_type": "",
+    "part_size_bytes": 0
+  }
+}
+
+example {
+  name: File upload created (Create image upload)
+  
+  request: {
+    url: {{baseUrl}}/files
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "file_name": "vacation-photo.jpg",
+        "file_size": 2048576,
+        "mime_type": "image/jpeg"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "id": "43833259-72ae-404e-8441-b6577f3159b4",
+          "status": "pending",
+          "created_time": "2025-01-15T10:30:00.000Z",
+          "file_name": "vacation-photo.jpg",
+          "file_size": 2048576,
+          "mime_type": "image/jpeg"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: File upload created (Create document upload)
+  
+  request: {
+    url: {{baseUrl}}/files
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "file_name": "quarterly-report.pdf",
+        "file_size": 5242880,
+        "mime_type": "application/pdf"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "id": "43833259-72ae-404e-8441-b6577f3159b4",
+          "status": "pending",
+          "created_time": "2025-01-15T10:30:00.000Z",
+          "file_name": "vacation-photo.jpg",
+          "file_size": 2048576,
+          "mime_type": "image/jpeg"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest (Create image upload)
+  
+  request: {
+    url: {{baseUrl}}/files
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "file_name": "vacation-photo.jpg",
+        "file_size": 2048576,
+        "mime_type": "image/jpeg"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest (Create document upload)
+  
+  request: {
+    url: {{baseUrl}}/files
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "file_name": "quarterly-report.pdf",
+        "file_size": 5242880,
+        "mime_type": "application/pdf"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: unauthorized (Create image upload)
+  
+  request: {
+    url: {{baseUrl}}/files
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "file_name": "vacation-photo.jpg",
+        "file_size": 2048576,
+        "mime_type": "image/jpeg"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 401,
+          "code": "unauthorized",
+          "message": "API token is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: unauthorized (Create document upload)
+  
+  request: {
+    url: {{baseUrl}}/files
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "file_name": "quarterly-report.pdf",
+        "file_size": 5242880,
+        "mime_type": "application/pdf"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 401,
+          "code": "unauthorized",
+          "message": "API token is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: rateLimited (Create image upload)
+  
+  request: {
+    url: {{baseUrl}}/files
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "file_name": "vacation-photo.jpg",
+        "file_size": 2048576,
+        "mime_type": "image/jpeg"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 429,
+          "code": "rate_limited",
+          "message": "Rate limit exceeded"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: rateLimited (Create document upload)
+  
+  request: {
+    url: {{baseUrl}}/files
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "file_name": "quarterly-report.pdf",
+        "file_size": 5242880,
+        "mime_type": "application/pdf"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 429,
+          "code": "rate_limited",
+          "message": "Rate limit exceeded"
+        }
+      '''
+    }
+  }
+}

@@ -1,0 +1,154 @@
+meta {
+  name: Create Files Upload (POST)
+  type: http
+  seq: 23
+}
+
+post {
+  url: {{baseUrl}}/files/upload/:upload_id
+  body: multipartForm
+  auth: inherit
+}
+
+params:path {
+  upload_id: 2343
+}
+
+headers {
+  Authorization: {{notion_token}}
+}
+
+body:multipart-form {
+  file: 
+}
+
+example {
+  name: Upload completed (Upload image file)
+  
+  request: {
+    url: {{baseUrl}}/files/upload/:upload_id
+    method: POST
+    mode: multipartForm
+    params:path: {
+      upload_id: 2343
+    }
+  
+    headers: {
+      Authorization: 
+    }
+  
+    body:multipart-form: {
+      file: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "file_upload",
+          "id": "43833259-72ae-404e-8441-b6577f3159b4",
+          "status": "uploaded"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Unauthorized error (Upload image file)
+  
+  request: {
+    url: {{baseUrl}}/files/upload/:upload_id
+    method: POST
+    mode: multipartForm
+    params:path: {
+      upload_id: 2343
+    }
+  
+    headers: {
+      Authorization: 
+    }
+  
+    body:multipart-form: {
+      file: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 401,
+          "code": "unauthorized",
+          "message": "API token is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Resource not found error (Upload image file)
+  
+  request: {
+    url: {{baseUrl}}/files/upload/:upload_id
+    method: POST
+    mode: multipartForm
+    params:path: {
+      upload_id: 2343
+    }
+  
+    headers: {
+      Authorization: 
+    }
+  
+    body:multipart-form: {
+      file: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 404,
+          "code": "object_not_found",
+          "message": "Could not find page with ID: 59833787-2cf9-4fdf-8782-e53db20768a5"
+        }
+      '''
+    }
+  }
+}

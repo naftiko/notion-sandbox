@@ -1,0 +1,113 @@
+meta {
+  name: Retrieve Pages Properties {property Id
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/pages/:page_id/properties/:property_id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  page_id: 
+  property_id: 
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+example {
+  name: property
+  
+  request: {
+    url: {{baseUrl}}/pages/:page_id/properties/:property_id
+    method: GET
+    mode: none
+    params:path: {
+      page_id: 
+      property_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "property_item",
+          "id": "title",
+          "type": "title",
+          "title": [
+            {
+              "type": "text",
+              "text": {
+                "content": "Page Title"
+              },
+              "plain_text": "Page Title"
+            }
+          ]
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: notFound
+  
+  request: {
+    url: {{baseUrl}}/pages/:page_id/properties/:property_id
+    method: GET
+    mode: none
+    params:path: {
+      page_id: 
+      property_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 404,
+          "code": "object_not_found",
+          "message": "Could not find the requested resource"
+        }
+      '''
+    }
+  }
+}

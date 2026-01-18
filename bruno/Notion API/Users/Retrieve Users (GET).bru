@@ -1,0 +1,278 @@
+meta {
+  name: Retrieve Users (GET)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/users/:user_id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  user_id: 
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+example {
+  name: personUser
+  
+  request: {
+    url: {{baseUrl}}/users/:user_id
+    method: GET
+    mode: none
+    params:path: {
+      user_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "user",
+          "id": "71e95936-2737-4e11-b03d-f174f6f13e90",
+          "type": "person",
+          "name": "Jane Doe",
+          "avatar_url": "https://example.com/avatar.jpg",
+          "person": {
+            "email": "jane@example.com"
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: botUser
+  
+  request: {
+    url: {{baseUrl}}/users/:user_id
+    method: GET
+    mode: none
+    params:path: {
+      user_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "user",
+          "id": "b8d9c9d5-b8a4-4f11-8f7c-8e5c6d4a3b2c",
+          "type": "bot",
+          "name": "My Integration",
+          "avatar_url": null,
+          "bot": {
+            "owner": {
+              "type": "workspace",
+              "workspace": true
+            },
+            "workspace_name": "My Workspace"
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest
+  
+  request: {
+    url: {{baseUrl}}/users/:user_id
+    method: GET
+    mode: none
+    params:path: {
+      user_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: unauthorized
+  
+  request: {
+    url: {{baseUrl}}/users/:user_id
+    method: GET
+    mode: none
+    params:path: {
+      user_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 401,
+          "code": "unauthorized",
+          "message": "API token is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: notFound
+  
+  request: {
+    url: {{baseUrl}}/users/:user_id
+    method: GET
+    mode: none
+    params:path: {
+      user_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 404,
+          "code": "object_not_found",
+          "message": "Could not find the requested resource"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: rateLimited
+  
+  request: {
+    url: {{baseUrl}}/users/:user_id
+    method: GET
+    mode: none
+    params:path: {
+      user_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 429,
+          "code": "rate_limited",
+          "message": "Rate limit exceeded"
+        }
+      '''
+    }
+  }
+}

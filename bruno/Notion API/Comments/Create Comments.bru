@@ -1,0 +1,325 @@
+meta {
+  name: Create Comments
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/comments
+  body: json
+  auth: inherit
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+body:json {
+  {
+    "parent": {
+      "page_id": ""
+    },
+    "discussion_id": "",
+    "rich_text": [
+      {
+        "type": "",
+        "plain_text": "",
+        "href": "",
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": false,
+          "underline": false,
+          "code": false,
+          "color": ""
+        },
+        "text": {
+          "content": "",
+          "link": {
+            "url": ""
+          }
+        }
+      }
+    ]
+  }
+}
+
+example {
+  name: createdComment (createComment)
+  
+  request: {
+    url: {{baseUrl}}/comments
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "parent": {
+          "page_id": "59833787-2cf9-4fdf-8782-e53db20768a5"
+        },
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "This is a comment on the page"
+            }
+          }
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "comment",
+          "id": "3c612f3a-f070-4f84-93aa-4f2f4e111111",
+          "parent": {
+            "type": "page_id",
+            "page_id": "59833787-2cf9-4fdf-8782-e53db20768a5"
+          },
+          "discussion_id": "7b3e5f85-09ab-4a8b-bc23-4f2f4e222222",
+          "created_time": "2023-01-15T10:30:00.000Z",
+          "last_edited_time": "2023-01-15T10:30:00.000Z",
+          "rich_text": [
+            {
+              "type": "text",
+              "text": {
+                "content": "This is a comment on the page"
+              },
+              "plain_text": "This is a comment on the page"
+            }
+          ]
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest (createComment)
+  
+  request: {
+    url: {{baseUrl}}/comments
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "parent": {
+          "page_id": "59833787-2cf9-4fdf-8782-e53db20768a5"
+        },
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "This is a comment on the page"
+            }
+          }
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: unauthorized (createComment)
+  
+  request: {
+    url: {{baseUrl}}/comments
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "parent": {
+          "page_id": "59833787-2cf9-4fdf-8782-e53db20768a5"
+        },
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "This is a comment on the page"
+            }
+          }
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 401,
+          "code": "unauthorized",
+          "message": "API token is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: notFound (createComment)
+  
+  request: {
+    url: {{baseUrl}}/comments
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "parent": {
+          "page_id": "59833787-2cf9-4fdf-8782-e53db20768a5"
+        },
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "This is a comment on the page"
+            }
+          }
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 404,
+          "code": "object_not_found",
+          "message": "Could not find the requested resource"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: rateLimited (createComment)
+  
+  request: {
+    url: {{baseUrl}}/comments
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "parent": {
+          "page_id": "59833787-2cf9-4fdf-8782-e53db20768a5"
+        },
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "This is a comment on the page"
+            }
+          }
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 429,
+          "code": "rate_limited",
+          "message": "Rate limit exceeded"
+        }
+      '''
+    }
+  }
+}

@@ -1,0 +1,255 @@
+meta {
+  name: Retrieve Users
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/users
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~page_size: 
+  ~start_cursor: 
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+example {
+  name: usersList
+  
+  request: {
+    url: {{baseUrl}}/users
+    method: GET
+    mode: none
+    params:query: {
+      ~page_size: 
+      ~start_cursor: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "list",
+          "results": [
+            {
+              "object": "user",
+              "id": "71e95936-2737-4e11-b03d-f174f6f13e90",
+              "type": "person",
+              "name": "Jane Doe",
+              "avatar_url": "https://example.com/avatar.jpg",
+              "person": {
+                "email": "jane@example.com"
+              }
+            },
+            {
+              "object": "user",
+              "id": "b8d9c9d5-b8a4-4f11-8f7c-8e5c6d4a3b2c",
+              "type": "bot",
+              "name": "My Integration",
+              "bot": {
+                "owner": {
+                  "type": "workspace"
+                },
+                "workspace_name": "My Workspace"
+              }
+            }
+          ],
+          "has_more": false,
+          "next_cursor": null,
+          "type": "user"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest
+  
+  request: {
+    url: {{baseUrl}}/users
+    method: GET
+    mode: none
+    params:query: {
+      ~page_size: 
+      ~start_cursor: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: unauthorized
+  
+  request: {
+    url: {{baseUrl}}/users
+    method: GET
+    mode: none
+    params:query: {
+      ~page_size: 
+      ~start_cursor: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 401,
+          "code": "unauthorized",
+          "message": "API token is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: rateLimited
+  
+  request: {
+    url: {{baseUrl}}/users
+    method: GET
+    mode: none
+    params:query: {
+      ~page_size: 
+      ~start_cursor: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 429,
+          "code": "rate_limited",
+          "message": "Rate limit exceeded"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: serverError
+  
+  request: {
+    url: {{baseUrl}}/users
+    method: GET
+    mode: none
+    params:query: {
+      ~page_size: 
+      ~start_cursor: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 500
+      text: Internal Server Error
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 500,
+          "code": "internal_server_error",
+          "message": "An unexpected error occurred"
+        }
+      '''
+    }
+  }
+}

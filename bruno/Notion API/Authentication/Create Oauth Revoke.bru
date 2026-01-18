@@ -1,0 +1,105 @@
+meta {
+  name: Create Oauth Revoke
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/oauth/revoke
+  body: json
+  auth: inherit
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+body:json {
+  {
+    "token": ""
+  }
+}
+
+example {
+  name: success (basic)
+  
+  request: {
+    url: {{baseUrl}}/oauth/revoke
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "token": "secret_abc123def456"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "revoked": true
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: unauthorized (basic)
+  
+  request: {
+    url: {{baseUrl}}/oauth/revoke
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "token": "secret_abc123def456"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 401,
+          "code": "unauthorized",
+          "message": "API token is invalid"
+        }
+      '''
+    }
+  }
+}

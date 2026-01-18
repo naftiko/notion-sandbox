@@ -1,0 +1,107 @@
+meta {
+  name: Retrieve File-uploads (1)
+  type: http
+  seq: 30
+}
+
+get {
+  url: {{baseUrl}}/file-uploads/:upload_id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  upload_id: 2343
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+example {
+  name: upload
+  
+  request: {
+    url: {{baseUrl}}/file-uploads/:upload_id
+    method: GET
+    mode: none
+    params:path: {
+      upload_id: 2343
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "file_upload",
+          "id": "01da9b00-e400-4959-91ce-af55307647e5",
+          "status": "completed",
+          "file": {
+            "type": "file",
+            "file": {
+              "url": "https://example.com/file.pdf"
+            }
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: notFound
+  
+  request: {
+    url: {{baseUrl}}/file-uploads/:upload_id
+    method: GET
+    mode: none
+    params:path: {
+      upload_id: 2343
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 404,
+          "code": "object_not_found",
+          "message": "Could not find the requested resource"
+        }
+      '''
+    }
+  }
+}

@@ -1,0 +1,263 @@
+meta {
+  name: Create File Uploads Sen
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/file_uploads/:file_upload_id/send
+  body: multipartForm
+  auth: inherit
+}
+
+params:path {
+  file_upload_id: 2343
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+body:multipart-form {
+  file: 
+  part_number: 
+}
+
+example {
+  name: Completed file upload (Upload image file)
+  
+  request: {
+    url: {{baseUrl}}/file_uploads/:file_upload_id/send
+    method: POST
+    mode: multipartForm
+    params:path: {
+      file_upload_id: 2343
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:multipart-form: {
+      file: 
+      part_number: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "file_upload",
+          "id": "a3f9d3e2-1abc-42de-b904-badc0ffee000",
+          "created_time": "2025-04-09T22:26:00.000Z",
+          "last_edited_time": "2025-04-09T22:27:00.000Z",
+          "expiry_time": "2025-04-09T23:26:00.000Z",
+          "archived": false,
+          "status": "uploaded",
+          "filename": "Really funny.gif",
+          "content_type": "image/gif",
+          "content_length": "4435",
+          "request_id": "91a4ee8c-61f6-4c27-bd41-09aa35299929"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest (Upload image file)
+  
+  request: {
+    url: {{baseUrl}}/file_uploads/:file_upload_id/send
+    method: POST
+    mode: multipartForm
+    params:path: {
+      file_upload_id: 2343
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:multipart-form: {
+      file: 
+      part_number: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: unauthorized (Upload image file)
+  
+  request: {
+    url: {{baseUrl}}/file_uploads/:file_upload_id/send
+    method: POST
+    mode: multipartForm
+    params:path: {
+      file_upload_id: 2343
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:multipart-form: {
+      file: 
+      part_number: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 401,
+          "code": "unauthorized",
+          "message": "API token is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: notFound (Upload image file)
+  
+  request: {
+    url: {{baseUrl}}/file_uploads/:file_upload_id/send
+    method: POST
+    mode: multipartForm
+    params:path: {
+      file_upload_id: 2343
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:multipart-form: {
+      file: 
+      part_number: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 404,
+          "code": "object_not_found",
+          "message": "Could not find the requested resource"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 413 Response (Upload image file)
+  description: Payload too large
+  
+  request: {
+    url: {{baseUrl}}/file_uploads/:file_upload_id/send
+    method: POST
+    mode: multipartForm
+    params:path: {
+      file_upload_id: 2343
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:multipart-form: {
+      file: 
+      part_number: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 413
+      text: Payload Too Large
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 413,
+          "code": "payload_too_large",
+          "message": "Part size exceeds maximum of 20971520 bytes"
+        }
+      '''
+    }
+  }
+}

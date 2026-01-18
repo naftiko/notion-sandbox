@@ -1,0 +1,735 @@
+meta {
+  name: Patch Pages
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{baseUrl}}/pages/:page_id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  page_id: 
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+body:json {
+  {
+    "properties": {},
+    "archived": false,
+    "icon": "",
+    "cover": ""
+  }
+}
+
+example {
+  name: updatedPage (updateProperties)
+  
+  request: {
+    url: {{baseUrl}}/pages/:page_id
+    method: PATCH
+    mode: json
+    params:path: {
+      page_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "properties": {
+          "Name": {
+            "title": [
+              {
+                "text": {
+                  "content": "Updated Title"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "page",
+          "id": "59833787-2cf9-4fdf-8782-e53db20768a5",
+          "created_time": "2023-01-15T10:30:00.000Z",
+          "last_edited_time": "2023-01-16T14:22:00.000Z",
+          "created_by": {
+            "object": "user",
+            "id": "71e95936-2737-4e11-b03d-f174f6f13e90"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "71e95936-2737-4e11-b03d-f174f6f13e90"
+          },
+          "archived": false,
+          "icon": {
+            "type": "emoji",
+            "emoji": "📄"
+          },
+          "cover": null,
+          "parent": {
+            "type": "database_id",
+            "database_id": "668d797c-76fa-4934-9b05-ad288df2d136"
+          },
+          "properties": {
+            "Name": {
+              "title": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "My Page Title"
+                  },
+                  "plain_text": "My Page Title",
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  }
+                }
+              ]
+            }
+          },
+          "url": "https://www.notion.so/My-Page-Title-59833787",
+          "public_url": null
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: updatedPage (archivePage)
+  
+  request: {
+    url: {{baseUrl}}/pages/:page_id
+    method: PATCH
+    mode: json
+    params:path: {
+      page_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "archived": true
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "page",
+          "id": "59833787-2cf9-4fdf-8782-e53db20768a5",
+          "created_time": "2023-01-15T10:30:00.000Z",
+          "last_edited_time": "2023-01-16T14:22:00.000Z",
+          "created_by": {
+            "object": "user",
+            "id": "71e95936-2737-4e11-b03d-f174f6f13e90"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "71e95936-2737-4e11-b03d-f174f6f13e90"
+          },
+          "archived": false,
+          "icon": {
+            "type": "emoji",
+            "emoji": "📄"
+          },
+          "cover": null,
+          "parent": {
+            "type": "database_id",
+            "database_id": "668d797c-76fa-4934-9b05-ad288df2d136"
+          },
+          "properties": {
+            "Name": {
+              "title": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "My Page Title"
+                  },
+                  "plain_text": "My Page Title",
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  }
+                }
+              ]
+            }
+          },
+          "url": "https://www.notion.so/My-Page-Title-59833787",
+          "public_url": null
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest (updateProperties)
+  
+  request: {
+    url: {{baseUrl}}/pages/:page_id
+    method: PATCH
+    mode: json
+    params:path: {
+      page_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "properties": {
+          "Name": {
+            "title": [
+              {
+                "text": {
+                  "content": "Updated Title"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest (archivePage)
+  
+  request: {
+    url: {{baseUrl}}/pages/:page_id
+    method: PATCH
+    mode: json
+    params:path: {
+      page_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "archived": true
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: unauthorized (updateProperties)
+  
+  request: {
+    url: {{baseUrl}}/pages/:page_id
+    method: PATCH
+    mode: json
+    params:path: {
+      page_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "properties": {
+          "Name": {
+            "title": [
+              {
+                "text": {
+                  "content": "Updated Title"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 401,
+          "code": "unauthorized",
+          "message": "API token is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: unauthorized (archivePage)
+  
+  request: {
+    url: {{baseUrl}}/pages/:page_id
+    method: PATCH
+    mode: json
+    params:path: {
+      page_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "archived": true
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 401,
+          "code": "unauthorized",
+          "message": "API token is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: notFound (updateProperties)
+  
+  request: {
+    url: {{baseUrl}}/pages/:page_id
+    method: PATCH
+    mode: json
+    params:path: {
+      page_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "properties": {
+          "Name": {
+            "title": [
+              {
+                "text": {
+                  "content": "Updated Title"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 404,
+          "code": "object_not_found",
+          "message": "Could not find the requested resource"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: notFound (archivePage)
+  
+  request: {
+    url: {{baseUrl}}/pages/:page_id
+    method: PATCH
+    mode: json
+    params:path: {
+      page_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "archived": true
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 404,
+          "code": "object_not_found",
+          "message": "Could not find the requested resource"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: conflict (updateProperties)
+  
+  request: {
+    url: {{baseUrl}}/pages/:page_id
+    method: PATCH
+    mode: json
+    params:path: {
+      page_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "properties": {
+          "Name": {
+            "title": [
+              {
+                "text": {
+                  "content": "Updated Title"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 409
+      text: Conflict
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 409,
+          "code": "conflict_error",
+          "message": "The resource has been modified"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: conflict (archivePage)
+  
+  request: {
+    url: {{baseUrl}}/pages/:page_id
+    method: PATCH
+    mode: json
+    params:path: {
+      page_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "archived": true
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 409
+      text: Conflict
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 409,
+          "code": "conflict_error",
+          "message": "The resource has been modified"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: rateLimited (updateProperties)
+  
+  request: {
+    url: {{baseUrl}}/pages/:page_id
+    method: PATCH
+    mode: json
+    params:path: {
+      page_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "properties": {
+          "Name": {
+            "title": [
+              {
+                "text": {
+                  "content": "Updated Title"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 429,
+          "code": "rate_limited",
+          "message": "Rate limit exceeded"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: rateLimited (archivePage)
+  
+  request: {
+    url: {{baseUrl}}/pages/:page_id
+    method: PATCH
+    mode: json
+    params:path: {
+      page_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "archived": true
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 429,
+          "code": "rate_limited",
+          "message": "Rate limit exceeded"
+        }
+      '''
+    }
+  }
+}

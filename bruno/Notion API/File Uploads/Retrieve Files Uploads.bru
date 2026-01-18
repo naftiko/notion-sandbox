@@ -1,0 +1,84 @@
+meta {
+  name: Retrieve Files Uploads
+  type: http
+  seq: 17
+}
+
+get {
+  url: {{baseUrl}}/files/uploads
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~start_cursor: 
+  ~page_size: 
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+example {
+  name: List of file uploads
+  
+  request: {
+    url: {{baseUrl}}/files/uploads
+    method: GET
+    mode: none
+    params:query: {
+      ~start_cursor: 
+      ~page_size: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "list",
+          "results": [
+            {
+              "object": "file_upload",
+              "id": "550e8400-e29b-41d4-a716-446655440000",
+              "filename": "company-logo.png",
+              "file_size_bytes": 1048576,
+              "mime_type": "image/png",
+              "status": "complete",
+              "created_time": "2025-01-15T10:30:00.000Z",
+              "completed_time": "2025-01-15T10:31:00.000Z"
+            },
+            {
+              "object": "file_upload",
+              "id": "660e8400-e29b-41d4-a716-446655440001",
+              "filename": "report.pdf",
+              "file_size_bytes": 2097152,
+              "mime_type": "application/pdf",
+              "status": "complete",
+              "created_time": "2025-01-14T15:20:00.000Z",
+              "completed_time": "2025-01-14T15:21:00.000Z"
+            }
+          ],
+          "has_more": false,
+          "next_cursor": null
+        }
+      '''
+    }
+  }
+}

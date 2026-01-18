@@ -1,0 +1,111 @@
+meta {
+  name: Create Oauth Token Refresh
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/oauth/token/refresh
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: {{notion_token}}
+}
+
+body:json {
+  {
+    "grant_type": "",
+    "refresh_token": ""
+  }
+}
+
+example {
+  name: success (default)
+  
+  request: {
+    url: {{baseUrl}}/oauth/token/refresh
+    method: POST
+    mode: json
+    headers: {
+      Authorization: 
+    }
+  
+    body:json: {
+      {
+        "grant_type": "refresh_token",
+        "refresh_token": "secret_refresh_xyz"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "access_token": "secret_abc123def456ghi789",
+          "token_type": "bearer",
+          "expires_in": 3600,
+          "refresh_token": "secret_refresh_xyz",
+          "workspace_id": "1234abcd-5678-90ef-ghij-klmnopqrstuv",
+          "workspace_name": "My Workspace",
+          "bot_id": "abcd1234-ef56-78gh-90ij-klmnopqrstuv"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest (default)
+  
+  request: {
+    url: {{baseUrl}}/oauth/token/refresh
+    method: POST
+    mode: json
+    headers: {
+      Authorization: 
+    }
+  
+    body:json: {
+      {
+        "grant_type": "refresh_token",
+        "refresh_token": "secret_refresh_xyz"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}

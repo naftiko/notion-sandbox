@@ -1,0 +1,92 @@
+meta {
+  name: Retrieve Files Uploads (GET)
+  type: http
+  seq: 18
+}
+
+get {
+  url: {{baseUrl}}/files/uploads/:upload_id
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: {{notion_token}}
+}
+
+example {
+  name: upload
+  
+  request: {
+    url: {{baseUrl}}/files/uploads/:upload_id
+    method: GET
+    mode: none
+    headers: {
+      Authorization: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "file_upload",
+          "id": "01da9b00-e400-4959-91ce-af55307647e5",
+          "status": "completed",
+          "file": {
+            "type": "file",
+            "file": {
+              "url": "https://example.com/file.pdf"
+            }
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: notFound
+  
+  request: {
+    url: {{baseUrl}}/files/uploads/:upload_id
+    method: GET
+    mode: none
+    headers: {
+      Authorization: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 404,
+          "code": "object_not_found",
+          "message": "Could not find the requested resource"
+        }
+      '''
+    }
+  }
+}

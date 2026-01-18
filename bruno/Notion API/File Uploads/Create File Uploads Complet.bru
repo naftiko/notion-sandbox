@@ -1,0 +1,133 @@
+meta {
+  name: Create File Uploads Complet
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/file_uploads/:file_upload_id/complete
+  body: json
+  auth: inherit
+}
+
+params:path {
+  file_upload_id: 2343
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+body:json {
+  {
+    "etags": []
+  }
+}
+
+example {
+  name: Multi-part upload completed (Complete multi-part upload)
+  
+  request: {
+    url: {{baseUrl}}/file_uploads/:file_upload_id/complete
+    method: POST
+    mode: json
+    params:path: {
+      file_upload_id: 2343
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "etags": [
+          "d8e8fca2dc0f896fd7cb4cb0031ba249",
+          "5d41402abc4b2a76b9719d911017c592",
+          "98f13708210194c475687be6106a3b84"
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "file_upload",
+          "id": "660e8400-e29b-41d4-a716-446655440001",
+          "filename": "product-demo.mp4",
+          "file_size_bytes": 52428800,
+          "mime_type": "video/mp4",
+          "status": "complete",
+          "created_time": "2025-01-15T10:30:00.000Z",
+          "completed_time": "2025-01-15T10:35:00.000Z",
+          "url": "https://prod-files-secure.s3.us-west-2.amazonaws.com/workspace-id/file-id/product-demo.mp4"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest (Complete multi-part upload)
+  
+  request: {
+    url: {{baseUrl}}/file_uploads/:file_upload_id/complete
+    method: POST
+    mode: json
+    params:path: {
+      file_upload_id: 2343
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "etags": [
+          "d8e8fca2dc0f896fd7cb4cb0031ba249",
+          "5d41402abc4b2a76b9719d911017c592",
+          "98f13708210194c475687be6106a3b84"
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}

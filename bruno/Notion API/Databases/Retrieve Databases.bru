@@ -1,0 +1,291 @@
+meta {
+  name: Retrieve Databases
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/databases/:database_id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  database_id: 11
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+example {
+  name: database
+  
+  request: {
+    url: {{baseUrl}}/databases/:database_id
+    method: GET
+    mode: none
+    params:path: {
+      database_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "database",
+          "id": "668d797c-76fa-4934-9b05-ad288df2d136",
+          "created_time": "2023-01-10T08:00:00.000Z",
+          "last_edited_time": "2023-01-15T12:00:00.000Z",
+          "title": [
+            {
+              "type": "text",
+              "text": {
+                "content": "My Database"
+              },
+              "plain_text": "My Database"
+            }
+          ],
+          "description": [],
+          "icon": {
+            "type": "emoji",
+            "emoji": "📊"
+          },
+          "cover": null,
+          "properties": {
+            "Name": {
+              "id": "title",
+              "type": "title",
+              "title": {}
+            },
+            "Status": {
+              "id": "%7D%5Cs",
+              "type": "status",
+              "status": {
+                "options": [
+                  {
+                    "name": "Not started",
+                    "color": "red"
+                  },
+                  {
+                    "name": "In progress",
+                    "color": "yellow"
+                  },
+                  {
+                    "name": "Done",
+                    "color": "green"
+                  }
+                ]
+              }
+            },
+            "Tags": {
+              "id": "tags",
+              "type": "multi_select",
+              "multi_select": {
+                "options": [
+                  {
+                    "name": "Important",
+                    "color": "red"
+                  },
+                  {
+                    "name": "Todo",
+                    "color": "blue"
+                  }
+                ]
+              }
+            }
+          },
+          "parent": {
+            "type": "page_id",
+            "page_id": "98ad959b-2b6a-4774-80ee-00246fb0ea9b"
+          },
+          "url": "https://www.notion.so/668d797c76fa49349b05ad288df2d136",
+          "archived": false,
+          "is_inline": false,
+          "public_url": null
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest
+  
+  request: {
+    url: {{baseUrl}}/databases/:database_id
+    method: GET
+    mode: none
+    params:path: {
+      database_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: unauthorized
+  
+  request: {
+    url: {{baseUrl}}/databases/:database_id
+    method: GET
+    mode: none
+    params:path: {
+      database_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 401,
+          "code": "unauthorized",
+          "message": "API token is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: notFound
+  
+  request: {
+    url: {{baseUrl}}/databases/:database_id
+    method: GET
+    mode: none
+    params:path: {
+      database_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 404,
+          "code": "object_not_found",
+          "message": "Could not find the requested resource"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: rateLimited
+  
+  request: {
+    url: {{baseUrl}}/databases/:database_id
+    method: GET
+    mode: none
+    params:path: {
+      database_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 429,
+          "code": "rate_limited",
+          "message": "Rate limit exceeded"
+        }
+      '''
+    }
+  }
+}

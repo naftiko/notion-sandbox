@@ -1,0 +1,123 @@
+meta {
+  name: Create Datasources
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/datasources
+  body: json
+  auth: inherit
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+body:json {
+  {
+    "name": "",
+    "properties": {}
+  }
+}
+
+example {
+  name: created (create)
+  
+  request: {
+    url: {{baseUrl}}/datasources
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "name": "New Data Source",
+        "properties": {
+          "field1": {
+            "type": "text"
+          }
+        }
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "datasource",
+          "id": "01da9b00-e400-4959-91ce-af55307647e5",
+          "name": "My Data Source",
+          "properties": {
+            "field1": {
+              "type": "text"
+            }
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest (create)
+  
+  request: {
+    url: {{baseUrl}}/datasources
+    method: POST
+    mode: json
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "name": "New Data Source",
+        "properties": {
+          "field1": {
+            "type": "text"
+          }
+        }
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}

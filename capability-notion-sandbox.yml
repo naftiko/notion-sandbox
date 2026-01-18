@@ -1,0 +1,128 @@
+---
+naftiko:
+
+  schema:  'https://github.com/naftiko/schema/blob/main/core/capability/capabiity-schema.yml'
+
+info:
+
+  name: Notion Sandbox
+  description: This is a Notion sandbox that uses OpenAPI, Microcks, and Bruno to provide a 3rd-pary API sandbox for Notion.
+
+  tags:
+
+    - Notion
+    - Sandbox
+
+ports:   
+
+  source:
+
+    - adapter: Composite
+      aid: notion-sandbox
+      title: API Resuability
+      description: Provides a composite HTTP API.
+      openApi:
+
+        - $ref: 'openapi/notion-sandbox.yml'  
+
+  artificialIntelligence:
+
+    - adapter: MCP
+      title: API Reusability MCP
+      jsonSchema:
+
+        - $ref: model-context-protocol/notion-sandbox-mcp.yml'            
+
+virtualization:
+
+  sandboxes: 
+
+    - name: Microcks REST Sandbox
+      type: REST
+      url: http://localhost:8080/rest/Notion+API/1.0.0  
+
+    - name: Microcks MCP Sandbox
+      type: MCP
+      url: http://localhost:8080/mcp/Notion+API/1.0.0/sse      
+
+useCase:
+
+  - $ref: 'https://github.com/naftiko/schema/blob/main/secondary/use-case/examples/use-case-example-api-sandbox.yml' 
+
+stakeholders:
+
+  - FN: Kin Lane
+    ROLE: Chief Community Officer (CCO)
+    EMAIL: kinlane@naftiko.io
+    SOCIALPROFILE: https://www.linkedin.com/in/kinlane/
+
+change:
+
+  state: New
+  
+  schemaVersion: 0.1.0
+  capabilityVersion: 0.1.0
+
+  updated: 2026-01-17T00:00:00Z
+  created: 2026-01-16T00:00:00Z  
+
+source:
+
+  httpUrl: https://github.com/naftiko/notion-sandbox
+  sshUrl: git@github.com:naftiko/notion-sandbox.git
+
+support:
+
+  issues: https://github.com/naftiko/notion-sandbox/issues
+  discussions: https://github.com/orgs/naftiko/discussions
+
+standards:
+
+  - name: Naftiko Capabilities
+    description: This uses a exploratory schema to help inform and shape capabilities.
+    docUrl: https://naftiko.github.io/technology/docs/capabilities/
+
+  - name: OpenAPI
+    description: This uses OpenAPI to define access to all HTTP APIs.
+    docUrl: https://naftiko.github.io/technology/docs/standards/openapi/
+
+  - name: JSON Schema
+    description: This uses JSON Schema to define and validate all entities used.
+    docUrl: https://naftiko.github.io/technology/docs/standards/json-schema/    
+
+  - name: Model Context Protocol
+    description: This uses MCP expresed as JSON schema to define each MCP server.
+    docUrl: https://naftiko.github.io/technology/docs/standards/model-context-protocol/
+
+  - name: Bruno Collections
+    description: This uses Bruno Collections to define each executable HTTP API integration.
+    docUrl: https://naftiko.github.io/technology/docs/standards/bruno-collections/        
+
+  - name: Bruno Environments
+    description: This uses Bruno Environments to store keys for each API to use in automation.
+    docUrl: https://naftiko.github.io/technology/docs/standards/bruno-environments/  
+
+  - name: API Commons
+    description: This uses an API Commons schema to define the plans and rate limits.
+    docUrl: https://naftiko.github.io/technology/docs/standards/api-commons/      
+
+services:
+
+  - aid: notion
+    name: Notion
+    description: Notion is an all-in-one workspace and productivity platform that combines notes, documents, databases, wikis, project management, and collaboration tools into a single application.
+    docUrl: https://naftiko.github.io/technology/docs/services/notion/
+    apisJson: https://raw.githubusercontent.com/api-evangelist/notion/refs/heads/main/apis.yml
+    loginUrl: https://www.notion.so/login
+    signUpUrl: https://www.notion.so/signup
+    termsOfServiceUrl: https://www.notion.so/terms
+    privacyPolicyUrl: https://privacycenter.notion.so/policies
+    plans:
+      - $ref: 'api-commons/plans-notion.yml'    
+    rateLimits:
+      - $ref: 'api-commons/rate-limits-notion.yml'                                        
+
+observability: 
+
+    visibility: Public  
+

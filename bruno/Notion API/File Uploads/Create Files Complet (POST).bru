@@ -1,0 +1,149 @@
+meta {
+  name: Create Files Complet (POST)
+  type: http
+  seq: 28
+}
+
+post {
+  url: {{baseUrl}}/files/:file_upload_id/complete
+  body: none
+  auth: inherit
+}
+
+params:path {
+  file_upload_id: 2343
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+example {
+  name: completed
+  
+  request: {
+    url: {{baseUrl}}/files/:file_upload_id/complete
+    method: POST
+    mode: none
+    params:path: {
+      file_upload_id: 2343
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "file_upload",
+          "id": "777e8888-e89b-12d3-a456-426614174000",
+          "status": "completed",
+          "file": {
+            "type": "file",
+            "file": {
+              "url": "https://example.com/file.pdf",
+              "expiry_time": "2023-01-02T00:00:00.000Z"
+            }
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest
+  
+  request: {
+    url: {{baseUrl}}/files/:file_upload_id/complete
+    method: POST
+    mode: none
+    params:path: {
+      file_upload_id: 2343
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: unauthorized
+  
+  request: {
+    url: {{baseUrl}}/files/:file_upload_id/complete
+    method: POST
+    mode: none
+    params:path: {
+      file_upload_id: 2343
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 401,
+          "code": "unauthorized",
+          "message": "API token is invalid"
+        }
+      '''
+    }
+  }
+}

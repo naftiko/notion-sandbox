@@ -1,0 +1,203 @@
+meta {
+  name: Create Files Upload
+  type: http
+  seq: 20
+}
+
+post {
+  url: {{baseUrl}}/files/upload
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: {{notion_token}}
+}
+
+body:json {
+  {
+    "filename": "",
+    "file_size_bytes": 0,
+    "mime_type": "",
+    "part_size_bytes": 0
+  }
+}
+
+example {
+  name: Successful file upload creation (Image file upload)
+  
+  request: {
+    url: {{baseUrl}}/files/upload
+    method: POST
+    mode: json
+    headers: {
+      Authorization: 
+    }
+  
+    body:json: {
+      {
+        "filename": "profile-photo.jpg",
+        "content_type": "image/jpeg",
+        "size": 524288
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "file_upload",
+          "id": "43833259-72ae-404e-8441-b6577f3159b4",
+          "status": "pending",
+          "filename": "profile-photo.jpg",
+          "content_type": "image/jpeg",
+          "size": 524288,
+          "upload_url": "https://upload.notion.com/..."
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Validation error (Image file upload)
+  
+  request: {
+    url: {{baseUrl}}/files/upload
+    method: POST
+    mode: json
+    headers: {
+      Authorization: 
+    }
+  
+    body:json: {
+      {
+        "filename": "profile-photo.jpg",
+        "content_type": "image/jpeg",
+        "size": 524288
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "validation_error",
+          "message": "body.size should be a positive integer"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Unauthorized error (Image file upload)
+  
+  request: {
+    url: {{baseUrl}}/files/upload
+    method: POST
+    mode: json
+    headers: {
+      Authorization: 
+    }
+  
+    body:json: {
+      {
+        "filename": "profile-photo.jpg",
+        "content_type": "image/jpeg",
+        "size": 524288
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 401,
+          "code": "unauthorized",
+          "message": "API token is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Rate limit error response (Image file upload)
+  
+  request: {
+    url: {{baseUrl}}/files/upload
+    method: POST
+    mode: json
+    headers: {
+      Authorization: 
+    }
+  
+    body:json: {
+      {
+        "filename": "profile-photo.jpg",
+        "content_type": "image/jpeg",
+        "size": 524288
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 429,
+          "code": "rate_limited",
+          "message": "Rate limit exceeded. Please retry after 10 seconds."
+        }
+      '''
+    }
+  }
+}

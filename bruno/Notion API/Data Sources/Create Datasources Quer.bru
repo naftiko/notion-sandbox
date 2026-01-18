@@ -1,0 +1,213 @@
+meta {
+  name: Create Datasources Quer
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/datasources/:datasource_id/query
+  body: json
+  auth: inherit
+}
+
+params:path {
+  datasource_id: 
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+body:json {
+  {
+    "filter": {},
+    "sorts": [
+      {
+        "property": "",
+        "direction": ""
+      }
+    ],
+    "start_cursor": "",
+    "page_size": 0
+  }
+}
+
+example {
+  name: results (query)
+  
+  request: {
+    url: {{baseUrl}}/datasources/:datasource_id/query
+    method: POST
+    mode: json
+    params:path: {
+      datasource_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "filter": {
+          "property": "field1",
+          "text": {
+            "contains": "search"
+          }
+        },
+        "sorts": [
+          {
+            "property": "field1",
+            "direction": "ascending"
+          }
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "list",
+          "results": [
+            {
+              "id": "01da9b00-e400-4959-91ce-af55307647e5",
+              "field1": "value"
+            }
+          ],
+          "next_cursor": null,
+          "has_more": false
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest (query)
+  
+  request: {
+    url: {{baseUrl}}/datasources/:datasource_id/query
+    method: POST
+    mode: json
+    params:path: {
+      datasource_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "filter": {
+          "property": "field1",
+          "text": {
+            "contains": "search"
+          }
+        },
+        "sorts": [
+          {
+            "property": "field1",
+            "direction": "ascending"
+          }
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: notFound (query)
+  
+  request: {
+    url: {{baseUrl}}/datasources/:datasource_id/query
+    method: POST
+    mode: json
+    params:path: {
+      datasource_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "filter": {
+          "property": "field1",
+          "text": {
+            "contains": "search"
+          }
+        },
+        "sorts": [
+          {
+            "property": "field1",
+            "direction": "ascending"
+          }
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 404,
+          "code": "object_not_found",
+          "message": "Could not find the requested resource"
+        }
+      '''
+    }
+  }
+}

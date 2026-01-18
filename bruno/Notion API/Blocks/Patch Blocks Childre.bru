@@ -1,0 +1,445 @@
+meta {
+  name: Patch Blocks Childre
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{baseUrl}}/blocks/:block_id/children
+  body: json
+  auth: inherit
+}
+
+params:path {
+  block_id: 
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+body:json {
+  {
+    "children": [
+      {
+        "object": "",
+        "id": "",
+        "type": "",
+        "created_time": "",
+        "created_by": {
+          "object": "",
+          "id": "",
+          "type": "",
+          "name": "",
+          "avatar_url": "",
+          "person": {
+            "email": ""
+          },
+          "bot": {
+            "owner": {},
+            "workspace_name": ""
+          }
+        },
+        "last_edited_time": "",
+        "last_edited_by": {},
+        "archived": false,
+        "has_children": false,
+        "parent": {}
+      }
+    ]
+  }
+}
+
+example {
+  name: appendedBlocks (appendParagraphs)
+  
+  request: {
+    url: {{baseUrl}}/blocks/:block_id/children
+    method: PATCH
+    mode: json
+    params:path: {
+      block_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "children": [
+          {
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "New paragraph 1"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "New paragraph 2"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "list",
+          "results": [
+            {
+              "object": "block",
+              "type": "paragraph",
+              "paragraph": {
+                "rich_text": [
+                  {
+                    "type": "text",
+                    "text": {
+                      "content": "New paragraph 1"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest (appendParagraphs)
+  
+  request: {
+    url: {{baseUrl}}/blocks/:block_id/children
+    method: PATCH
+    mode: json
+    params:path: {
+      block_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "children": [
+          {
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "New paragraph 1"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "New paragraph 2"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: unauthorized (appendParagraphs)
+  
+  request: {
+    url: {{baseUrl}}/blocks/:block_id/children
+    method: PATCH
+    mode: json
+    params:path: {
+      block_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "children": [
+          {
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "New paragraph 1"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "New paragraph 2"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 401,
+          "code": "unauthorized",
+          "message": "API token is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: notFound (appendParagraphs)
+  
+  request: {
+    url: {{baseUrl}}/blocks/:block_id/children
+    method: PATCH
+    mode: json
+    params:path: {
+      block_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "children": [
+          {
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "New paragraph 1"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "New paragraph 2"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 404,
+          "code": "object_not_found",
+          "message": "Could not find the requested resource"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: rateLimited (appendParagraphs)
+  
+  request: {
+    url: {{baseUrl}}/blocks/:block_id/children
+    method: PATCH
+    mode: json
+    params:path: {
+      block_id: 
+    }
+  
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  
+    body:json: {
+      {
+        "children": [
+          {
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "New paragraph 1"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "New paragraph 2"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 429,
+          "code": "rate_limited",
+          "message": "Rate limit exceeded"
+        }
+      '''
+    }
+  }
+}

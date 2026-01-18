@@ -1,0 +1,421 @@
+meta {
+  name: Retrieve Example-endpoint
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/example-endpoint
+  body: none
+  auth: inherit
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+example {
+  name: Successful response
+  
+  request: {
+    url: {{baseUrl}}/example-endpoint
+    method: GET
+    mode: none
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "page",
+          "id": "be907abe-510e-4116-a3d1-7ea71018c06f"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: invalidRequest
+  
+  request: {
+    url: {{baseUrl}}/example-endpoint
+    method: GET
+    mode: none
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 400,
+          "code": "invalid_request",
+          "message": "The request is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: unauthorized
+  
+  request: {
+    url: {{baseUrl}}/example-endpoint
+    method: GET
+    mode: none
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 401,
+          "code": "unauthorized",
+          "message": "API token is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: restrictedResource
+  
+  request: {
+    url: {{baseUrl}}/example-endpoint
+    method: GET
+    mode: none
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 403,
+          "code": "restricted_resource",
+          "message": "Access to this resource is restricted"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: notFound
+  
+  request: {
+    url: {{baseUrl}}/example-endpoint
+    method: GET
+    mode: none
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 404,
+          "code": "object_not_found",
+          "message": "Could not find the requested resource"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: conflict
+  
+  request: {
+    url: {{baseUrl}}/example-endpoint
+    method: GET
+    mode: none
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 409
+      text: Conflict
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 409,
+          "code": "conflict_error",
+          "message": "The resource has been modified"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: rateLimited
+  
+  request: {
+    url: {{baseUrl}}/example-endpoint
+    method: GET
+    mode: none
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 429,
+          "code": "rate_limited",
+          "message": "Rate limit exceeded"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: serverError
+  
+  request: {
+    url: {{baseUrl}}/example-endpoint
+    method: GET
+    mode: none
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 500
+      text: Internal Server Error
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 500,
+          "code": "internal_server_error",
+          "message": "An unexpected error occurred"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Bad gateway error
+  
+  request: {
+    url: {{baseUrl}}/example-endpoint
+    method: GET
+    mode: none
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 502
+      text: Bad Gateway
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 502,
+          "code": "bad_gateway",
+          "message": "Bad Gateway"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: unavailable
+  
+  request: {
+    url: {{baseUrl}}/example-endpoint
+    method: GET
+    mode: none
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 503
+      text: Service Unavailable
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 503,
+          "code": "service_unavailable",
+          "message": "Service is temporarily unavailable"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Gateway timeout
+  
+  request: {
+    url: {{baseUrl}}/example-endpoint
+    method: GET
+    mode: none
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 504
+      text: Gateway Timeout
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 504,
+          "code": "gateway_timeout",
+          "message": "Gateway Timeout"
+        }
+      '''
+    }
+  }
+}

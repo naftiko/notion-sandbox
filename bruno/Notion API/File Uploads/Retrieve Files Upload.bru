@@ -1,0 +1,179 @@
+meta {
+  name: Retrieve Files Upload
+  type: http
+  seq: 24
+}
+
+get {
+  url: {{baseUrl}}/files/upload/:upload_id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  upload_id: 2343
+}
+
+headers {
+  Authorization: {{notion_token}}
+}
+
+example {
+  name: Pending upload
+  
+  request: {
+    url: {{baseUrl}}/files/upload/:upload_id
+    method: GET
+    mode: none
+    params:path: {
+      upload_id: 2343
+    }
+  
+    headers: {
+      Authorization: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "file_upload",
+          "id": "43833259-72ae-404e-8441-b6577f3159b4",
+          "status": "pending",
+          "filename": "document.pdf"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Uploaded file
+  
+  request: {
+    url: {{baseUrl}}/files/upload/:upload_id
+    method: GET
+    mode: none
+    params:path: {
+      upload_id: 2343
+    }
+  
+    headers: {
+      Authorization: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "file_upload",
+          "id": "43833259-72ae-404e-8441-b6577f3159b4",
+          "status": "uploaded",
+          "filename": "document.pdf"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Unauthorized error
+  
+  request: {
+    url: {{baseUrl}}/files/upload/:upload_id
+    method: GET
+    mode: none
+    params:path: {
+      upload_id: 2343
+    }
+  
+    headers: {
+      Authorization: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 401,
+          "code": "unauthorized",
+          "message": "API token is invalid"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Resource not found error
+  
+  request: {
+    url: {{baseUrl}}/files/upload/:upload_id
+    method: GET
+    mode: none
+    params:path: {
+      upload_id: 2343
+    }
+  
+    headers: {
+      Authorization: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "error",
+          "status": 404,
+          "code": "object_not_found",
+          "message": "Could not find page with ID: 59833787-2cf9-4fdf-8782-e53db20768a5"
+        }
+      '''
+    }
+  }
+}

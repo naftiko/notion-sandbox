@@ -1,0 +1,57 @@
+meta {
+  name: Retrieve Data Sources Templates
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/data_sources/templates
+  body: none
+  auth: inherit
+}
+
+headers {
+  Notion-Version: '2025-09-03'
+  Authorization: {{notion_token}}
+}
+
+example {
+  name: default
+  
+  request: {
+    url: {{baseUrl}}/data_sources/templates
+    method: GET
+    mode: none
+    headers: {
+      Notion-Version: '2025-09-03'
+      Authorization: {{notion_token}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "list",
+          "results": [
+            {
+              "id": "template1",
+              "name": "Template 1",
+              "description": "A sample template"
+            }
+          ]
+        }
+      '''
+    }
+  }
+}
