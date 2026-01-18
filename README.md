@@ -21,6 +21,7 @@ This is just the initial draft of this repository, and there is more work to be 
 - **Defaults** - More work is needed on the default values for the OpenAPI parameters and bodies to make everything work smoothly.
 - **Errors** - More Dispatcher work is needed to get all the unhappy path responses to work as expected for 4xx and 5xx errors.
 - **Backstage** - We will add a Backstage software catalog entity for the sandbox, allowing it to be distributed to Backstage.
+- **Summary** - Generate a summary of the sandbox, with the number of paths, operations, and other relevant data and add to the README and capability.
 
 ## Support
 Please provide any questions or feedback via GitHub issues, or just email kinlane@naftiko.io with feedback. The goal is to keep iterating upon this sandbox using existing OpenAPI, Microcks, and Bruno features, offering value out of the box via this forkable third-party Notion API sandbox.
