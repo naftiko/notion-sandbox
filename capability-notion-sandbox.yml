@@ -45,6 +45,19 @@ virtualization:
       type: MCP
       url: http://localhost:8080/mcp/Notion+API/1.0.0/sse      
 
+metrics:
+
+  numberOfPaths: 29
+  numberOfOperations: 37
+  numberOfReadOperations: 14
+  numberOfWriteOperations: 23
+  numberOfSchemas: 127
+  numberOfResponses: 9
+  numberOfParameters: 12
+  numberOfExamples: 69
+  numberOfRequestBodies: 0
+  numberOfHeaders: 1
+
 useCase:
 
   - $ref: 'https://github.com/naftiko/schema/blob/main/secondary/use-case/examples/use-case-example-api-sandbox.yml' 
