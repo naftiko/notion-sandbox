@@ -5,14 +5,14 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}/datasources
+  url: {{baseUrl}}/data_sources
   body: json
   auth: inherit
 }
 
 headers {
-  Notion-Version: '2025-09-03'
-  Authorization: {{notion_token}}
+  Notion-Version: 
+  Authorization: 
 }
 
 body:json {
@@ -26,12 +26,12 @@ example {
   name: created (create)
   
   request: {
-    url: {{baseUrl}}/datasources
+    url: {{baseUrl}}/data_sources
     method: POST
     mode: json
     headers: {
-      Notion-Version: '2025-09-03'
-      Authorization: {{notion_token}}
+      Notion-Version: 
+      Authorization: 
     }
   
     body:json: {
@@ -78,12 +78,12 @@ example {
   name: invalidRequest (create)
   
   request: {
-    url: {{baseUrl}}/datasources
+    url: {{baseUrl}}/data_sources
     method: POST
     mode: json
     headers: {
-      Notion-Version: '2025-09-03'
-      Authorization: {{notion_token}}
+      Notion-Version: 
+      Authorization: 
     }
   
     body:json: {

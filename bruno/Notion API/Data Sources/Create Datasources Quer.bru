@@ -5,18 +5,18 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}/datasources/:datasource_id/query
+  url: {{baseUrl}}/data_sources/:data_source_id/query
   body: json
   auth: inherit
 }
 
 params:path {
-  datasource_id: 
+  data_source_id: 
 }
 
 headers {
-  Notion-Version: '2025-09-03'
-  Authorization: {{notion_token}}
+  Notion-Version: 
+  Authorization: 
 }
 
 body:json {
@@ -37,16 +37,16 @@ example {
   name: results (query)
   
   request: {
-    url: {{baseUrl}}/datasources/:datasource_id/query
+    url: {{baseUrl}}/data_sources/:data_source_id/query
     method: POST
     mode: json
     params:path: {
-      datasource_id: 
+      data_source_id: 
     }
   
     headers: {
-      Notion-Version: '2025-09-03'
-      Authorization: {{notion_token}}
+      Notion-Version: 
+      Authorization: 
     }
   
     body:json: {
@@ -100,16 +100,16 @@ example {
   name: invalidRequest (query)
   
   request: {
-    url: {{baseUrl}}/datasources/:datasource_id/query
+    url: {{baseUrl}}/data_sources/:data_source_id/query
     method: POST
     mode: json
     params:path: {
-      datasource_id: 
+      data_source_id: 
     }
   
     headers: {
-      Notion-Version: '2025-09-03'
-      Authorization: {{notion_token}}
+      Notion-Version: 
+      Authorization: 
     }
   
     body:json: {
@@ -158,16 +158,16 @@ example {
   name: notFound (query)
   
   request: {
-    url: {{baseUrl}}/datasources/:datasource_id/query
+    url: {{baseUrl}}/data_sources/:data_source_id/query
     method: POST
     mode: json
     params:path: {
-      datasource_id: 
+      data_source_id: 
     }
   
     headers: {
-      Notion-Version: '2025-09-03'
-      Authorization: {{notion_token}}
+      Notion-Version: 
+      Authorization: 
     }
   
     body:json: {

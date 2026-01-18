@@ -5,18 +5,18 @@ meta {
 }
 
 patch {
-  url: {{baseUrl}}/datasources/:datasource_id
+  url: {{baseUrl}}/data_sources/:data_source_id
   body: json
   auth: inherit
 }
 
 params:path {
-  datasource_id: 
+  data_source_id: 
 }
 
 headers {
-  Notion-Version: '2025-09-03'
-  Authorization: {{notion_token}}
+  Notion-Version: 
+  Authorization: 
 }
 
 body:json {
@@ -30,16 +30,16 @@ example {
   name: updated (update)
   
   request: {
-    url: {{baseUrl}}/datasources/:datasource_id
+    url: {{baseUrl}}/data_sources/:data_source_id
     method: PATCH
     mode: json
     params:path: {
-      datasource_id: 
+      data_source_id: 
     }
   
     headers: {
-      Notion-Version: '2025-09-03'
-      Authorization: {{notion_token}}
+      Notion-Version: 
+      Authorization: 
     }
   
     body:json: {
@@ -81,16 +81,16 @@ example {
   name: invalidRequest (update)
   
   request: {
-    url: {{baseUrl}}/datasources/:datasource_id
+    url: {{baseUrl}}/data_sources/:data_source_id
     method: PATCH
     mode: json
     params:path: {
-      datasource_id: 
+      data_source_id: 
     }
   
     headers: {
-      Notion-Version: '2025-09-03'
-      Authorization: {{notion_token}}
+      Notion-Version: 
+      Authorization: 
     }
   
     body:json: {
@@ -128,16 +128,16 @@ example {
   name: notFound (update)
   
   request: {
-    url: {{baseUrl}}/datasources/:datasource_id
+    url: {{baseUrl}}/data_sources/:data_source_id
     method: PATCH
     mode: json
     params:path: {
-      datasource_id: 
+      data_source_id: 
     }
   
     headers: {
-      Notion-Version: '2025-09-03'
-      Authorization: {{notion_token}}
+      Notion-Version: 
+      Authorization: 
     }
   
     body:json: {

@@ -5,20 +5,20 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/comments
+  url: {{baseUrl}}/comments?block_id=11
   body: none
   auth: inherit
 }
 
 params:query {
-  block_id: 
+  block_id: 11
   ~page_size: 
   ~start_cursor: 
 }
 
 headers {
-  Notion-Version: '2025-09-03'
-  Authorization: {{notion_token}}
+  Notion-Version: 
+  Authorization: 
 }
 
 example {
@@ -35,8 +35,8 @@ example {
     }
   
     headers: {
-      Notion-Version: '2025-09-03'
-      Authorization: {{notion_token}}
+      Notion-Version: 
+      Authorization: 
     }
   }
   
@@ -92,8 +92,8 @@ example {
     }
   
     headers: {
-      Notion-Version: '2025-09-03'
-      Authorization: {{notion_token}}
+      Notion-Version: 
+      Authorization: 
     }
   }
   
@@ -135,8 +135,8 @@ example {
     }
   
     headers: {
-      Notion-Version: '2025-09-03'
-      Authorization: {{notion_token}}
+      Notion-Version: 
+      Authorization: 
     }
   }
   
@@ -178,8 +178,8 @@ example {
     }
   
     headers: {
-      Notion-Version: '2025-09-03'
-      Authorization: {{notion_token}}
+      Notion-Version: 
+      Authorization: 
     }
   }
   

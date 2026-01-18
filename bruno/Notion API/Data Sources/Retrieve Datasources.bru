@@ -5,34 +5,34 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/datasources/:datasource_id
+  url: {{baseUrl}}/data_sources/:data_source_id
   body: none
   auth: inherit
 }
 
 params:path {
-  datasource_id: 
+  data_source_id: 111
 }
 
 headers {
-  Notion-Version: '2025-09-03'
-  Authorization: {{notion_token}}
+  Notion-Version: 
+  Authorization: 
 }
 
 example {
   name: datasource
   
   request: {
-    url: {{baseUrl}}/datasources/:datasource_id
+    url: {{baseUrl}}/data_sources/:data_source_id
     method: GET
     mode: none
     params:path: {
-      datasource_id: 
+      data_source_id: 
     }
   
     headers: {
-      Notion-Version: '2025-09-03'
-      Authorization: {{notion_token}}
+      Notion-Version: 
+      Authorization: 
     }
   }
   
@@ -68,16 +68,16 @@ example {
   name: notFound
   
   request: {
-    url: {{baseUrl}}/datasources/:datasource_id
+    url: {{baseUrl}}/data_sources/:data_source_id
     method: GET
     mode: none
     params:path: {
-      datasource_id: 
+      data_source_id: 
     }
   
     headers: {
-      Notion-Version: '2025-09-03'
-      Authorization: {{notion_token}}
+      Notion-Version: 
+      Authorization: 
     }
   }
   
