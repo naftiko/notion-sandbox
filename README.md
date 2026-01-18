@@ -13,6 +13,40 @@ This sandbox uses Microcks to deliver the mock API. [You just install Microcks, 
 ## Bruno
 This sandbox [uses Bruno as the client](https://www.usebruno.com/), leveraging a [Bruno Collection](bruno/Notion+API/) pre-generated from the OpenAPI and a [Bruno environment](bruno/Notion+API/environments/) that uses the localhost and port of Microcks to work with the mocked API. You just have to install Microcks, then open the collection provided in this repository, select the available environment, and begin calling the Notion API via the sandbox.
 
+## Paths
+These are all of the available paths in this sandbox, providing a complete view of what you can do within this sandbox using the mocked Notion API.
+
+- /blocks/{block_id}
+- /blocks/{block_id}/children
+- /comments
+- /comments/{comment_id}
+- /data_sources
+- /data_sources/{data_source_id}
+- /data_sources/{data_source_id}/query
+- /data_sources/{data_source_id}/templates
+- /databases
+- /databases/{database_id}
+- /file_uploads
+- /file_uploads/{file_upload_id}
+- /file_uploads/{file_upload_id}/complete
+- /file_uploads/{file_upload_id}/send
+- /link-unfurl
+- /oauth/token
+- /oauth/token/introspect
+- /oauth/token/refresh
+- /oauth/token/revoke
+- /pages
+- /pages/{page_id}
+- /pages/{page_id}/move
+- /pages/{page_id}/properties/{property_id}
+- /search
+- /unfurl
+- /users
+- /users/me
+- /users/{user_id}
+- /webhook/events
+
+
 ## Work
 This is just the initial draft of this repository, and there is more work to be done to make it deliver everything possible using these open-source specifications and tooling:
 

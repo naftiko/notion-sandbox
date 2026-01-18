@@ -10,117 +10,7 @@ info:
 tags:
   - name: Notion
 paths:
-  /pages/{page_id}:
-    get:
-      summary: Retrieve Pages
-      operationId: retrievePages
-      tags:
-        - Pages
-      parameters:
-        - $ref: '#/components/parameters/NotionVersionHeader'
-        - name: page_id
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/UUID'
-          description: Page identifier
-        - $ref: '#/components/parameters/Authorization'
-      responses:
-        '200':
-          description: Successfully retrieved page
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Page'
-              examples:
-                page:
-                  $ref: '#/components/examples/SimplePage'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/RateLimited'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-    patch:
-      summary: Patch Pages
-      operationId: patchPages
-      tags:
-        - Pages
-      parameters:
-        - $ref: '#/components/parameters/NotionVersionHeader'
-        - name: page_id
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/UUID'
-        - $ref: '#/components/parameters/Authorization'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdatePageRequest'
-            examples:
-              updateProperties:
-                value:
-                  properties:
-                    Name:
-                      title:
-                        - text:
-                            content: Updated Title
-              archivePage:
-                value:
-                  archived: true
-      responses:
-        '200':
-          description: Page updated successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Page'
-              examples:
-                updatedPage:
-                  $ref: '#/components/examples/SimplePage'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '429':
-          $ref: '#/components/responses/RateLimited'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
+
   /oauth/token:
     post:
       operationId: createOauthToken
@@ -165,35 +55,33 @@ paths:
         dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
       parameters:
         - $ref: '#/components/parameters/Authorization'
-  /oauth/introspect:
+
+  /oauth/token/introspect:
     post:
+      operationId: createOauthTokenIntrospect
+      summary: Create Oauth Token Introspect
+      description: Get information about the current token
       tags:
         - Authentication
-      summary: Create Oauth Introspect
-      operationId: createOauthIntrospect
-      description: Get information about the current access token
-      parameters:
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/Authorization'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/IntrospectTokenRequest'
+              $ref: '#/components/schemas/IntrospectRequest'
             examples:
-              basic:
-                $ref: '#/components/examples/IntrospectTokenRequestExample'
+              introspect:
+                $ref: '#/components/examples/IntrospectRequestExample'
       responses:
         '200':
-          description: Token information retrieved
+          description: Token introspection successful
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IntrospectTokenResponse'
+                $ref: '#/components/schemas/IntrospectResponse'
               examples:
-                success:
-                  $ref: '#/components/examples/IntrospectTokenResponseExample'
+                active:
+                  $ref: '#/components/examples/IntrospectResponseExample'
           x-microcks-refs:
             - success
         '401':
@@ -210,16 +98,14 @@ paths:
         dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
       security:
         - bearerHttpAuthentication: []
-  /oauth/revoke:
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
+  /oauth/token/revoke:
     post:
+      operationId: createOauthTokenRevoke
+      summary: Create Oauth Token Revoke
       tags:
         - Authentication
-      summary: Create Oauth Revoke
-      operationId: createOauthRevoke
-      description: Revoke an access token
-      parameters:
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/Authorization'
       requestBody:
         required: true
         content:
@@ -227,8 +113,8 @@ paths:
             schema:
               $ref: '#/components/schemas/RevokeTokenRequest'
             examples:
-              basic:
-                $ref: '#/components/examples/RevokeTokenRequestExample'
+              default:
+                $ref: '#/components/examples/RevokeTokenRequest'
       responses:
         '200':
           description: Token revoked successfully
@@ -238,7 +124,7 @@ paths:
                 $ref: '#/components/schemas/RevokeTokenResponse'
               examples:
                 success:
-                  $ref: '#/components/examples/RevokeTokenResponseExample'
+                  $ref: '#/components/examples/RevokeTokenResponseSuccess'
           x-microcks-refs:
             - success
         '401':
@@ -255,16 +141,14 @@ paths:
         dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
       security:
         - bearerHttpAuthentication: []
-  /oauth/refresh:
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
+  /oauth/token/refresh:
     post:
+      operationId: createOauthTokenRefresh
+      summary: Create Oauth Token Refresh
       tags:
         - Authentication
-      summary: Create Oauth Refresh
-      operationId: createOauthRefresh
-      description: Refresh an expired access token
-      parameters:
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/Authorization'
       requestBody:
         required: true
         content:
@@ -272,8 +156,8 @@ paths:
             schema:
               $ref: '#/components/schemas/RefreshTokenRequest'
             examples:
-              basic:
-                $ref: '#/components/examples/RefreshTokenRequestExample'
+              default:
+                $ref: '#/components/examples/RefreshTokenRequest'
       responses:
         '200':
           description: Token refreshed successfully
@@ -283,11 +167,11 @@ paths:
                 $ref: '#/components/schemas/TokenResponse'
               examples:
                 success:
-                  $ref: '#/components/examples/TokenResponseExample'
+                  $ref: '#/components/examples/TokenResponseSuccess'
           x-microcks-refs:
             - success
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
       x-naftiko:
         GenerateOperationSummariesFromPath: true
         CaselCaseOperationIds: true
@@ -300,6 +184,9 @@ paths:
         dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
       security:
         - bearerHttpAuthentication: []
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
+
   /blocks/{block_id}:
     get:
       summary: Retrieve Blocks
@@ -592,12 +479,13 @@ paths:
         dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
       security:
         - bearerHttpAuthentication: []
-  /pages:
+      
+  /comments:
     post:
-      summary: Create Pages
-      operationId: createPages
+      summary: Create Comments
+      operationId: createComments
       tags:
-        - Pages
+        - Comments
       parameters:
         - $ref: '#/components/parameters/NotionVersionHeader'
         - $ref: '#/components/parameters/Authorization'
@@ -606,46 +494,45 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreatePageRequest'
+              $ref: '#/components/schemas/CreateCommentRequest'
             examples:
-              createPageInDatabase:
+              createComment:
                 value:
                   parent:
-                    database_id: 668d797c-76fa-4934-9b05-ad288df2d136
-                  properties:
-                    Name:
-                      title:
-                        - text:
-                            content: New Page
-                  icon:
-                    type: emoji
-                    emoji: 📄
-                  children:
-                    - object: block
-                      type: paragraph
-                      paragraph:
-                        rich_text:
-                          - type: text
-                            text:
-                              content: This is the first paragraph
+                    page_id: 59833787-2cf9-4fdf-8782-e53db20768a5
+                  rich_text:
+                    - type: text
+                      text:
+                        content: This is a comment on the page
       responses:
         '200':
-          description: Page created successfully
+          description: Comment created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Page'
+                $ref: '#/components/schemas/Comment'
               examples:
-                createdPage:
-                  $ref: '#/components/examples/SimplePage'
+                createdComment:
+                  value:
+                    object: comment
+                    id: 3c612f3a-f070-4f84-93aa-4f2f4e111111
+                    parent:
+                      type: page_id
+                      page_id: 59833787-2cf9-4fdf-8782-e53db20768a5
+                    discussion_id: 7b3e5f85-09ab-4a8b-bc23-4f2f4e222222
+                    created_time: '2023-01-15T10:30:00.000Z'
+                    last_edited_time: '2023-01-15T10:30:00.000Z'
+                    rich_text:
+                      - type: text
+                        text:
+                          content: This is a comment on the page
+                        plain_text: This is a comment on the page
           x-microcks-refs:
             - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '429':
@@ -662,78 +549,86 @@ paths:
         dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
       security:
         - bearerHttpAuthentication: []
-  /pages/{page_id}/properties/{property_id}:
     get:
+      summary: Retrieve Comments
+      operationId: retrieveComments
       tags:
-        - Pages
-      summary: Retrieve Pages Properties {property Id
-      operationId: retrievePagesPropertiesPropertyId
-      description: Retrieves a property_item object for a given page_id and property_id
+        - Comments
       parameters:
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/PageId'
-        - $ref: '#/components/parameters/PropertyId'
+        - $ref: '#/components/parameters/NotionVersionHeader'
+        - name: block_id
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+          description: Block or page ID to retrieve comments for
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/StartCursor'
         - $ref: '#/components/parameters/Authorization'
       responses:
         '200':
-          description: Property retrieved successfully
+          description: Successfully retrieved comments
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PropertyItem'
+                $ref: '#/components/schemas/CommentsList'
               examples:
-                property:
-                  $ref: '#/components/examples/PropertyItemExample'
-          x-microcks-refs:
-            - success
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /pages/{page_id}/move:
-    post:
-      tags:
-        - Pages
-      summary: Create Pages Mov
-      operationId: createPagesMov
-      description: Moves a page to a new parent
-      parameters:
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/PageId'
-        - $ref: '#/components/parameters/Authorization'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/MovePageRequest'
-            examples:
-              move:
-                $ref: '#/components/examples/MovePageRequestExample'
-      responses:
-        '200':
-          description: Page moved successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Page'
-              examples:
-                moved:
-                  $ref: '#/components/examples/PageExample'
+                comments:
+                  value:
+                    object: list
+                    results:
+                      - object: comment
+                        id: 3c612f3a-f070-4f84-93aa-4f2f4e111111
+                        rich_text:
+                          - type: text
+                            text:
+                              content: First comment
+                    has_more: false
+                    next_cursor: null
+                    type: comment
           x-microcks-refs:
             - success
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+      x-naftiko:
+        GenerateOperationSummariesFromPath: true
+        CaselCaseOperationIds: true
+        AddedMicrocksOperations: true
+        AddedMicrocksRefs: true
+        AddBearerAuthtoOperations: true
+        AddAuthorizationHeaderParameterToOperations: true
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+      security:
+        - bearerHttpAuthentication: []
+  /comments/{comment_id}:
+    get:
+      tags:
+        - Comments
+      summary: Retrieve Comments
+      operationId: retrieveComments
+      description: Retrieves a comment object using its ID
+      parameters:
+        - $ref: '#/components/parameters/NotionVersion'
+        - $ref: '#/components/parameters/CommentId'
+        - $ref: '#/components/parameters/Authorization'
+      responses:
+        '200':
+          description: Comment retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+              examples:
+                comment:
+                  $ref: '#/components/examples/CommentExample'
+          x-microcks-refs:
+            - success
         '404':
           $ref: '#/components/responses/NotFound'
       x-naftiko:
@@ -748,6 +643,7 @@ paths:
         dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
       security:
         - bearerHttpAuthentication: []
+
   /databases:
     post:
       summary: Create Databases
@@ -937,7 +833,8 @@ paths:
         dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
       security:
         - bearerHttpAuthentication: []
-  /datasources:
+
+  /data_sources:
     post:
       tags:
         - Data Sources
@@ -982,7 +879,7 @@ paths:
         dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
       security:
         - bearerHttpAuthentication: []
-  /datasources/{datasource_id}:
+  /data_sources/{data_source_id}:
     get:
       tags:
         - Data Sources
@@ -1066,7 +963,7 @@ paths:
         dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
       security:
         - bearerHttpAuthentication: []
-  /datasources/{datasource_id}/query:
+  /data_sources/{data_source_id}/query:
     post:
       tags:
         - Data Sources
@@ -1114,538 +1011,67 @@ paths:
         dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
       security:
         - bearerHttpAuthentication: []
-  /datasources/templates:
+
+  /data_sources/{data_source_id}/templates:
     get:
+      summary: Retrieve Data Sources Template
+      description: >
+        Use this API to retrieve details of all page templates available for a
+        data source.
+
+
+        The response object contains an array `page_size` results (up to 100)
+        under the `templates` key.
+
+
+        **Pagination**: When there are more templates than the current API
+        response contains, the `has_more` 
+
+        boolean field is set to `true`, and the `next_cursor` is set to the ID
+        of the next template to use 
+
+        as the `start_cursor` of your next API request.
+
+
+        Only templates under the data source identified by the `data_source_id`
+        in the URL are returned. 
+
+        The bot must have access to the template for it to appear in this API.
+
+
+        Templates are also valid Notion pages, so you can retrieve a template's
+        full properties and content 
+
+        using the Retrieve a page API.
+      operationId: retrieveDataSourcesTemplate
       tags:
-        - Data Sources
-      summary: Retrieve Datasources Templates
-      operationId: retrieveDatasourcesTemplates
-      description: Returns a list of available data source templates
+        - Data sources
       parameters:
+        - $ref: '#/components/parameters/DataSourceIdPath'
+        - $ref: '#/components/parameters/StartCursor'
+        - $ref: '#/components/parameters/PageSize'
         - $ref: '#/components/parameters/NotionVersion'
         - $ref: '#/components/parameters/Authorization'
       responses:
         '200':
-          description: Templates retrieved successfully
+          description: Successfully retrieved data source templates
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DataSourceTemplatesResponse'
+                $ref: '#/components/schemas/TemplateListResponse'
               examples:
-                templates:
-                  $ref: '#/components/examples/DataSourceTemplatesResponseExample'
-          x-microcks-refs:
-            - success
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /comments:
-    post:
-      summary: Create Comments
-      operationId: createComments
-      tags:
-        - Comments
-      parameters:
-        - $ref: '#/components/parameters/NotionVersionHeader'
-        - $ref: '#/components/parameters/Authorization'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateCommentRequest'
-            examples:
-              createComment:
-                value:
-                  parent:
-                    page_id: 59833787-2cf9-4fdf-8782-e53db20768a5
-                  rich_text:
-                    - type: text
-                      text:
-                        content: This is a comment on the page
-      responses:
-        '200':
-          description: Comment created successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Comment'
-              examples:
-                createdComment:
-                  value:
-                    object: comment
-                    id: 3c612f3a-f070-4f84-93aa-4f2f4e111111
-                    parent:
-                      type: page_id
-                      page_id: 59833787-2cf9-4fdf-8782-e53db20768a5
-                    discussion_id: 7b3e5f85-09ab-4a8b-bc23-4f2f4e222222
-                    created_time: '2023-01-15T10:30:00.000Z'
-                    last_edited_time: '2023-01-15T10:30:00.000Z'
-                    rich_text:
-                      - type: text
-                        text:
-                          content: This is a comment on the page
-                        plain_text: This is a comment on the page
+                successfulResponse:
+                  $ref: '#/components/examples/TemplateListSuccessExample'
           x-microcks-refs:
             - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/RateLimited'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-    get:
-      summary: Retrieve Comments
-      operationId: retrieveComments
-      tags:
-        - Comments
-      parameters:
-        - $ref: '#/components/parameters/NotionVersionHeader'
-        - name: block_id
-          in: query
-          required: true
-          schema:
-            $ref: '#/components/schemas/UUID'
-          description: Block or page ID to retrieve comments for
-        - $ref: '#/components/parameters/PageSize'
-        - $ref: '#/components/parameters/StartCursor'
-        - $ref: '#/components/parameters/Authorization'
-      responses:
-        '200':
-          description: Successfully retrieved comments
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CommentsList'
-              examples:
-                comments:
-                  value:
-                    object: list
-                    results:
-                      - object: comment
-                        id: 3c612f3a-f070-4f84-93aa-4f2f4e111111
-                        rich_text:
-                          - type: text
-                            text:
-                              content: First comment
-                    has_more: false
-                    next_cursor: null
-                    type: comment
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '429':
-          $ref: '#/components/responses/RateLimited'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /comments/{comment_id}:
-    get:
-      tags:
-        - Comments
-      summary: Retrieve Comments
-      operationId: retrieveComments
-      description: Retrieves a comment object using its ID
-      parameters:
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/CommentId'
-        - $ref: '#/components/parameters/Authorization'
-      responses:
-        '200':
-          description: Comment retrieved successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Comment'
-              examples:
-                comment:
-                  $ref: '#/components/examples/CommentExample'
-          x-microcks-refs:
-            - success
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /files:
-    post:
-      tags:
-        - File Uploads
-      operationId: createFiles
-      summary: Create Files
-      description: >-
-        Initialize a file upload session to upload files programmatically to
-        Notion
-      parameters:
-        - $ref: '#/components/parameters/NotionVersionHeader'
-        - $ref: '#/components/parameters/Authorization'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateFileUploadRequest'
-            examples:
-              imageUpload:
-                $ref: '#/components/examples/CreateFileUploadImageExample'
-              documentUpload:
-                $ref: '#/components/examples/CreateFileUploadDocumentExample'
-      responses:
-        '200':
-          description: File upload created successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUploadObject'
-              examples:
-                success:
-                  $ref: '#/components/examples/FileUploadCreatedExample'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '429':
-          $ref: '#/components/responses/RateLimited'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-    get:
-      tags:
-        - File Uploads
-      operationId: retrieveFiles
-      summary: Retrieve Files
-      description: Retrieve a paginated list of file uploads
-      parameters:
-        - $ref: '#/components/parameters/NotionVersionHeader'
-        - $ref: '#/components/parameters/PageSize'
-        - $ref: '#/components/parameters/StartCursor'
-        - $ref: '#/components/parameters/Authorization'
-      responses:
-        '200':
-          description: List of file uploads retrieved successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUploadListResponse'
-              examples:
-                listResponse:
-                  $ref: '#/components/examples/FileUploadListExample'
-          x-microcks-refs:
-            - success
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '429':
-          $ref: '#/components/responses/RateLimited'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /files/{file_id}:
-    get:
-      tags:
-        - File Uploads
-      summary: Retrieve Files
-      description: Retrieves a file upload by ID
-      operationId: retrieveFiles
-      parameters:
-        - $ref: '#/components/parameters/FileId'
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/Authorization'
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUpload'
-              examples:
-                success:
-                  $ref: '#/components/examples/FileUploadResponse'
-          x-microcks-refs:
-            - success
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /files/{file_id}/send:
-    post:
-      tags:
-        - File Uploads
-      summary: Create Files Sen
-      description: Uploads file data to the specified upload session
-      operationId: createFilesSen
-      parameters:
-        - $ref: '#/components/parameters/FileId'
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/Authorization'
-      requestBody:
-        required: true
-        content:
-          application/octet-stream:
-            schema:
-              type: string
-              format: binary
-      responses:
-        '200':
-          description: File data uploaded successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUpload'
-              examples:
-                success:
-                  $ref: '#/components/examples/FileUploadResponse'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /files/{file_id}/complete:
-    post:
-      tags:
-        - File Uploads
-      summary: Create Files Complet
-      description: Completes the file upload session
-      operationId: createFilesComplet
-      parameters:
-        - $ref: '#/components/parameters/FileId'
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/Authorization'
-      responses:
-        '200':
-          description: File upload completed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUpload'
-              examples:
-                success:
-                  $ref: '#/components/examples/FileUploadResponse'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /search:
-    post:
-      summary: Create Search
-      operationId: createSearch
-      tags:
-        - Search
-      parameters:
-        - $ref: '#/components/parameters/NotionVersionHeader'
-        - $ref: '#/components/parameters/Authorization'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SearchRequest'
-            examples:
-              searchAll:
-                value: {}
-              searchByQuery:
-                value:
-                  query: meeting notes
-              searchPagesOnly:
-                value:
-                  filter:
-                    value: page
-                    property: object
-              searchWithSort:
-                value:
-                  query: project
-                  sort:
-                    direction: descending
-                    timestamp: last_edited_time
-      responses:
-        '200':
-          description: Search executed successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SearchResponse'
-              examples:
-                searchResults:
-                  value:
-                    object: list
-                    results:
-                      - object: page
-                        id: 59833787-2cf9-4fdf-8782-e53db20768a5
-                        properties:
-                          title:
-                            title:
-                              - text:
-                                  content: Meeting Notes
-                      - object: database
-                        id: 668d797c-76fa-4934-9b05-ad288df2d136
-                        title:
-                          - text:
-                              content: Projects Database
-                    has_more: false
-                    next_cursor: null
-                    type: page_or_database
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '429':
-          $ref: '#/components/responses/RateLimited'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /users:
-    get:
-      summary: Retrieve Users
-      operationId: retrieveUsers
-      tags:
-        - Users
-      parameters:
-        - $ref: '#/components/parameters/NotionVersionHeader'
-        - $ref: '#/components/parameters/PageSize'
-        - $ref: '#/components/parameters/StartCursor'
-        - $ref: '#/components/parameters/Authorization'
-      responses:
-        '200':
-          description: Successfully retrieved users
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UsersList'
-              examples:
-                usersList:
-                  value:
-                    object: list
-                    results:
-                      - object: user
-                        id: 71e95936-2737-4e11-b03d-f174f6f13e90
-                        type: person
-                        name: Jane Doe
-                        avatar_url: https://example.com/avatar.jpg
-                        person:
-                          email: jane@example.com
-                      - object: user
-                        id: b8d9c9d5-b8a4-4f11-8f7c-8e5c6d4a3b2c
-                        type: bot
-                        name: My Integration
-                        bot:
-                          owner:
-                            type: workspace
-                          workspace_name: My Workspace
-                    has_more: false
-                    next_cursor: null
-                    type: user
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '429':
           $ref: '#/components/responses/RateLimited'
         '500':
@@ -1661,438 +1087,8 @@ paths:
         dispatcher: SCRIPT
         dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
       security:
-        - bearerHttpAuthentication: []
-  /users/{user_id}:
-    get:
-      summary: Retrieve Users
-      operationId: retrieveUsers
-      tags:
-        - Users
-      parameters:
-        - $ref: '#/components/parameters/NotionVersionHeader'
-        - name: user_id
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/UUID'
-          description: User identifier
-        - $ref: '#/components/parameters/Authorization'
-      responses:
-        '200':
-          description: Successfully retrieved user
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-              examples:
-                personUser:
-                  $ref: '#/components/examples/PersonUser'
-                botUser:
-                  $ref: '#/components/examples/BotUser'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/RateLimited'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /users/me:
-    get:
-      summary: Retrieve Users Me
-      operationId: retrieveUsersMe
-      tags:
-        - Users
-      parameters:
-        - $ref: '#/components/parameters/NotionVersionHeader'
-        - $ref: '#/components/parameters/Authorization'
-      responses:
-        '200':
-          description: Successfully retrieved bot user
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-              examples:
-                botUser:
-                  $ref: '#/components/examples/BotUser'
-          x-microcks-refs:
-            - success
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '429':
-          $ref: '#/components/responses/RateLimited'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /oauth/token/introspect:
-    post:
-      operationId: createOauthTokenIntrospect
-      summary: Create Oauth Token Introspect
-      description: Get information about the current token
-      tags:
-        - Authentication
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/IntrospectRequest'
-            examples:
-              introspect:
-                $ref: '#/components/examples/IntrospectRequestExample'
-      responses:
-        '200':
-          description: Token introspection successful
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/IntrospectResponse'
-              examples:
-                active:
-                  $ref: '#/components/examples/IntrospectResponseExample'
-          x-microcks-refs:
-            - success
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-      parameters:
-        - $ref: '#/components/parameters/Authorization'
-  /oauth/token/revoke:
-    post:
-      operationId: createOauthTokenRevoke
-      summary: Create Oauth Token Revoke
-      tags:
-        - Authentication
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RevokeTokenRequest'
-            examples:
-              default:
-                $ref: '#/components/examples/RevokeTokenRequest'
-      responses:
-        '200':
-          description: Token revoked successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RevokeTokenResponse'
-              examples:
-                success:
-                  $ref: '#/components/examples/RevokeTokenResponseSuccess'
-          x-microcks-refs:
-            - success
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-      parameters:
-        - $ref: '#/components/parameters/Authorization'
-  /oauth/token/refresh:
-    post:
-      operationId: createOauthTokenRefresh
-      summary: Create Oauth Token Refresh
-      tags:
-        - Authentication
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RefreshTokenRequest'
-            examples:
-              default:
-                $ref: '#/components/examples/RefreshTokenRequest'
-      responses:
-        '200':
-          description: Token refreshed successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TokenResponse'
-              examples:
-                success:
-                  $ref: '#/components/examples/TokenResponseSuccess'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-      parameters:
-        - $ref: '#/components/parameters/Authorization'
-  /data_sources:
-    post:
-      tags:
-        - Data Sources
-      operationId: createDataSources
-      summary: Create Data Sources
-      description: Creates a new data source within a database
-      parameters:
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/Authorization'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateDataSourceRequest'
-            examples:
-              basicDataSource:
-                $ref: '#/components/examples/CreateDataSourceRequestExample'
-      responses:
-        '200':
-          description: Data source created successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DataSource'
-              examples:
-                dataSourceResponse:
-                  $ref: '#/components/examples/DataSourceResponseExample'
-          x-microcks-refs:
-            - success
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /data_sources/{data_source_id}:
-    patch:
-      operationId: patchDataSources
-      summary: Patch Data Sources
-      description: >
-        Updates the data source object — the properties, title, description, or
-        whether it's in the trash — of a specified data source under a database.
+        - bearerHttpAuthentication: []        
 
-
-        Returns the updated data source object.
-
-
-        Use the `parent` parameter to move the data source to a different
-        `database_id`. If you do so, any existing views that refer to the data
-        source in the current database continue to exist, but become *linked*
-        views.
-
-
-        **Note:** The following data source properties cannot be updated via the
-        API:
-
-        - `formula`
-
-        - `status`
-
-        - Synced content
-
-        - `place`
-      tags:
-        - Data sources
-      parameters:
-        - $ref: '#/components/parameters/DataSourceId'
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/Authorization'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateDataSourceRequest'
-            examples:
-              updateTitle:
-                $ref: '#/components/examples/UpdateDataSourceTitleExample'
-              updateProperties:
-                $ref: '#/components/examples/UpdateDataSourcePropertiesExample'
-              moveDataSource:
-                $ref: '#/components/examples/MoveDataSourceExample'
-              archiveDataSource:
-                $ref: '#/components/examples/ArchiveDataSourceExample'
-      responses:
-        '200':
-          description: Successfully updated data source
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DataSource'
-              examples:
-                updatedDataSource:
-                  $ref: '#/components/examples/UpdatedDataSourceResponse'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/RateLimited'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /data_sources/{data_source_id}/query:
-    post:
-      summary: Create Data Sources Quer
-      description: >
-        Gets a list of pages contained in the data source, filtered and ordered
-        according to the filter conditions and sort criteria provided in the
-        request. The response may contain fewer than `page_size` of results. If
-        the response includes a `next_cursor` value, refer to the pagination
-        reference for details about how to use a cursor to iterate through the
-        list.
-      operationId: createDataSourcesQuer
-      tags:
-        - Data sources
-      parameters:
-        - $ref: '#/components/parameters/DataSourceId'
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/FilterProperties'
-        - $ref: '#/components/parameters/Authorization'
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/QueryDataSourceRequest'
-            examples:
-              simpleQuery:
-                $ref: '#/components/examples/SimpleQueryRequest'
-              filteredQuery:
-                $ref: '#/components/examples/FilteredQueryRequest'
-              sortedQuery:
-                $ref: '#/components/examples/SortedQueryRequest'
-              complexQuery:
-                $ref: '#/components/examples/ComplexQueryRequest'
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/QueryDataSourceResponse'
-              examples:
-                successfulQuery:
-                  $ref: '#/components/examples/SuccessfulQueryResponse'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-      security:
-        - BearerAuth: []
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-  /data_sources/templates:
-    get:
-      tags:
-        - Data Sources
-      operationId: retrieveDataSourcesTemplates
-      summary: Retrieve Data Sources Templates
-      description: Returns available data source templates
-      parameters:
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/Authorization'
-      responses:
-        '200':
-          $ref: '#/components/responses/DataSourceTemplatesResponse'
-          x-microcks-refs:
-            - success
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
   /file_uploads:
     post:
       tags:
@@ -2339,37 +1335,13 @@ paths:
         dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
       security:
         - bearerHttpAuthentication: []
-  /databases/:
+
+  /pages:
     post:
-      operationId: createDatabases
-      summary: Create Databases
-      description: >
-        Creates a database as a subpage in the specified parent page, with the
-        specified properties schema. 
-
-        Currently, the parent of a new database must be a Notion page or a wiki
-        database.
-
-
-        **⚠️ Deprecated as of version 2025-09-03**
-
-
-        This endpoint is deprecated. Please use the new APIs:
-
-        - [Create a database](/reference/database-create)
-
-        - [Create a data source](/reference/create-a-data-source)
-
-
-        **Integration capabilities:** This endpoint requires an integration to
-        have insert content capabilities.
-
-
-        **Limitations:** Creating new `status` database properties is currently
-        not supported.
-      deprecated: true
+      summary: Create Pages
+      operationId: createPages
       tags:
-        - Databases (deprecated)
+        - Pages
       parameters:
         - $ref: '#/components/parameters/NotionVersionHeader'
         - $ref: '#/components/parameters/Authorization'
@@ -2378,105 +1350,38 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateDatabaseRequest'
+              $ref: '#/components/schemas/CreatePageRequest'
             examples:
-              basicDatabase:
-                $ref: '#/components/examples/CreateDatabaseBasicRequest'
-              fullDatabase:
-                $ref: '#/components/examples/CreateDatabaseFullRequest'
+              createPageInDatabase:
+                value:
+                  parent:
+                    database_id: 668d797c-76fa-4934-9b05-ad288df2d136
+                  properties:
+                    Name:
+                      title:
+                        - text:
+                            content: New Page
+                  icon:
+                    type: emoji
+                    emoji: 📄
+                  children:
+                    - object: block
+                      type: paragraph
+                      paragraph:
+                        rich_text:
+                          - type: text
+                            text:
+                              content: This is the first paragraph
       responses:
         '200':
-          description: Successfully created database
-          headers:
-            RateLimit-Limit:
-              $ref: '#/components/headers/RateLimit-Limit'
-            RateLimit-Remaining:
-              $ref: '#/components/headers/RateLimit-Remaining'
-            RateLimit-Reset:
-              $ref: '#/components/headers/RateLimit-Reset'
+          description: Page created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DatabaseObject'
+                $ref: '#/components/schemas/Page'
               examples:
-                basicDatabase:
-                  $ref: '#/components/examples/DatabaseObjectBasic'
-                fullDatabase:
-                  $ref: '#/components/examples/DatabaseObjectFull'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /data_sources/{data_source_id}/templates:
-    get:
-      summary: Retrieve Data Sources Template
-      description: >
-        Use this API to retrieve details of all page templates available for a
-        data source.
-
-
-        The response object contains an array `page_size` results (up to 100)
-        under the `templates` key.
-
-
-        **Pagination**: When there are more templates than the current API
-        response contains, the `has_more` 
-
-        boolean field is set to `true`, and the `next_cursor` is set to the ID
-        of the next template to use 
-
-        as the `start_cursor` of your next API request.
-
-
-        Only templates under the data source identified by the `data_source_id`
-        in the URL are returned. 
-
-        The bot must have access to the template for it to appear in this API.
-
-
-        Templates are also valid Notion pages, so you can retrieve a template's
-        full properties and content 
-
-        using the Retrieve a page API.
-      operationId: retrieveDataSourcesTemplate
-      tags:
-        - Data sources
-      parameters:
-        - $ref: '#/components/parameters/DataSourceIdPath'
-        - $ref: '#/components/parameters/StartCursor'
-        - $ref: '#/components/parameters/PageSize'
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/Authorization'
-      responses:
-        '200':
-          description: Successfully retrieved data source templates
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TemplateListResponse'
-              examples:
-                successfulResponse:
-                  $ref: '#/components/examples/TemplateListSuccessExample'
+                createdPage:
+                  $ref: '#/components/examples/SimplePage'
           x-microcks-refs:
             - success
         '400':
@@ -2489,8 +1394,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '429':
           $ref: '#/components/responses/RateLimited'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
       x-naftiko:
         GenerateOperationSummariesFromPath: true
         CaselCaseOperationIds: true
@@ -2503,266 +1406,74 @@ paths:
         dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
       security:
         - bearerHttpAuthentication: []
-  /data-sources:
-    post:
-      operationId: createDataSources
-      summary: Create Data-sources
-      tags:
-        - Data sources
-      parameters:
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/Authorization'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateDataSourceRequest'
-            examples:
-              basic:
-                $ref: '#/components/examples/CreateDataSourceBasic'
-      responses:
-        '200':
-          description: Data source created successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DataSource'
-              examples:
-                success:
-                  $ref: '#/components/examples/DataSourceSuccess'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /data-sources/{data_source_id}:
+  /pages/{page_id}/properties/{property_id}:
     get:
-      summary: Retrieve Data-sources
-      description: Retrieves a data source object including its properties schema
-      operationId: retrieveDataSources
       tags:
-        - Data Sources
-      security:
-        - BearerAuth: []
+        - Pages
+      summary: Retrieve Pages Properties {property Id
+      operationId: retrievePagesPropertiesPropertyId
+      description: Retrieves a property_item object for a given page_id and property_id
       parameters:
-        - $ref: '#/components/parameters/NotionVersionHeader'
-        - name: data_source_id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: The data source identifier
-          example: 8994905a-074a-415f-9bcf-d1f8b4fa38e4
-        - $ref: '#/components/parameters/Authorization'
-      responses:
-        '200':
-          description: Successful response with data source properties
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  object:
-                    type: string
-                    enum:
-                      - data_source
-                  id:
-                    type: string
-                    format: uuid
-                  properties:
-                    $ref: '#/components/schemas/DataSourceProperties'
-              examples:
-                dataSourceWithProperties:
-                  value:
-                    object: data_source
-                    id: 8994905a-074a-415f-9bcf-d1f8b4fa38e4
-                    properties:
-                      Status:
-                        id: biOx
-                        name: Status
-                        type: status
-                        status:
-                          options:
-                            - id: 034ece9a-384d-4d1f-97f7-7f685b29ae9b
-                              name: Not started
-                              color: default
-                          groups:
-                            - id: b9d42483-e576-4858-a26f-ed940a5f678f
-                              name: To-do
-                              color: gray
-                              option_ids:
-                                - 034ece9a-384d-4d1f-97f7-7f685b29ae9b
-          x-microcks-refs:
-            - success
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Data source not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-    patch:
-      summary: Patch Data-sources
-      description: Updates the properties of a data source
-      operationId: patchDataSources
-      tags:
-        - Data Sources
-      security:
-        - BearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/NotionVersionHeader'
-        - name: data_source_id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: The data source identifier
-        - $ref: '#/components/parameters/Authorization'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                properties:
-                  $ref: '#/components/schemas/DataSourceProperties'
-            examples:
-              addNumberProperty:
-                value:
-                  properties:
-                    Budget:
-                      name: Budget
-                      type: number
-                      number:
-                        format: dollar
-              addMultiSelectProperty:
-                value:
-                  properties:
-                    Tags:
-                      name: Tags
-                      type: multi_select
-                      multi_select:
-                        options:
-                          - name: Important
-                            color: red
-                          - name: Urgent
-                            color: orange
-      responses:
-        '200':
-          description: Successfully updated data source
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  object:
-                    type: string
-                    enum:
-                      - data_source
-                  id:
-                    type: string
-                    format: uuid
-                  properties:
-                    $ref: '#/components/schemas/DataSourceProperties'
-              examples:
-                updatedDataSource:
-                  value:
-                    object: data_source
-                    id: 8994905a-074a-415f-9bcf-d1f8b4fa38e4
-                    properties:
-                      Budget:
-                        id: newId123
-                        name: Budget
-                        type: number
-                        number:
-                          format: dollar
-          x-microcks-refs:
-            - success
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-  /data-sources/{data_source_id}/query:
-    post:
-      operationId: createDataSourcesQuer
-      summary: Create Data-sources Quer
-      tags:
-        - Data sources
-      parameters:
-        - $ref: '#/components/parameters/DataSourceId'
         - $ref: '#/components/parameters/NotionVersion'
+        - $ref: '#/components/parameters/PageId'
+        - $ref: '#/components/parameters/PropertyId'
+        - $ref: '#/components/parameters/Authorization'
+      responses:
+        '200':
+          description: Property retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PropertyItem'
+              examples:
+                property:
+                  $ref: '#/components/examples/PropertyItemExample'
+          x-microcks-refs:
+            - success
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-naftiko:
+        GenerateOperationSummariesFromPath: true
+        CaselCaseOperationIds: true
+        AddedMicrocksOperations: true
+        AddedMicrocksRefs: true
+        AddBearerAuthtoOperations: true
+        AddAuthorizationHeaderParameterToOperations: true
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+      security:
+        - bearerHttpAuthentication: []
+  /pages/{page_id}/move:
+    post:
+      tags:
+        - Pages
+      summary: Create Pages Mov
+      operationId: createPagesMov
+      description: Moves a page to a new parent
+      parameters:
+        - $ref: '#/components/parameters/NotionVersion'
+        - $ref: '#/components/parameters/PageId'
         - $ref: '#/components/parameters/Authorization'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/QueryDataSourceRequest'
+              $ref: '#/components/schemas/MovePageRequest'
             examples:
-              filtered:
-                $ref: '#/components/examples/QueryDataSourceFiltered'
+              move:
+                $ref: '#/components/examples/MovePageRequestExample'
       responses:
         '200':
-          description: Data source queried successfully
+          description: Page moved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/QueryDataSourceResponse'
+                $ref: '#/components/schemas/Page'
               examples:
-                success:
-                  $ref: '#/components/examples/QueryDataSourceResponseSuccess'
+                moved:
+                  $ref: '#/components/examples/PageExample'
           x-microcks-refs:
             - success
         '400':
@@ -2781,27 +1492,41 @@ paths:
         dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
       security:
         - bearerHttpAuthentication: []
-  /data-sources/templates:
+  /pages/{page_id}:
     get:
-      operationId: retrieveDataSourcesTemplates
-      summary: Retrieve Data-sources Templates
+      summary: Retrieve Pages
+      operationId: retrievePages
       tags:
-        - Data sources
+        - Pages
       parameters:
-        - $ref: '#/components/parameters/NotionVersion'
+        - $ref: '#/components/parameters/NotionVersionHeader'
+        - name: page_id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+          description: Page identifier
         - $ref: '#/components/parameters/Authorization'
       responses:
         '200':
-          description: Templates listed successfully
+          description: Successfully retrieved page
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DataSourceTemplatesResponse'
+                $ref: '#/components/schemas/Page'
               examples:
-                success:
-                  $ref: '#/components/examples/DataSourceTemplatesSuccess'
+                page:
+                  $ref: '#/components/examples/SimplePage'
           x-microcks-refs:
             - success
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
       x-naftiko:
         GenerateOperationSummariesFromPath: true
         CaselCaseOperationIds: true
@@ -2814,1013 +1539,151 @@ paths:
         dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
       security:
         - bearerHttpAuthentication: []
-  /databases/{database_id}/query:
-    post:
-      summary: Create Databases Quer
-      operationId: createDatabasesQuer
+    patch:
+      summary: Patch Pages
+      operationId: patchPages
       tags:
-        - Databases
+        - Pages
       parameters:
         - $ref: '#/components/parameters/NotionVersionHeader'
-        - name: database_id
+        - name: page_id
           in: path
           required: true
           schema:
             $ref: '#/components/schemas/UUID'
         - $ref: '#/components/parameters/Authorization'
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/QueryDatabaseRequest'
-            examples:
-              queryAll:
-                value: {}
-              queryWithFilter:
-                value:
-                  filter:
-                    property: Status
-                    select:
-                      equals: In progress
-              queryWithSort:
-                value:
-                  sorts:
-                    - property: Name
-                      direction: ascending
-              queryPaginated:
-                value:
-                  page_size: 10
-                  start_cursor: c02fc1d3-db8b-45c5-a222-27595b15aea7
-      responses:
-        '200':
-          description: Query executed successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/QueryDatabaseResponse'
-              examples:
-                queryResults:
-                  value:
-                    object: list
-                    results:
-                      - object: page
-                        id: 59833787-2cf9-4fdf-8782-e53db20768a5
-                        properties:
-                          Name:
-                            title:
-                              - text:
-                                  content: My Page
-                    has_more: false
-                    next_cursor: null
-                    type: page
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/RateLimited'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /file-uploads:
-    post:
-      tags:
-        - File Uploads
-      summary: Create File-uploads
-      operationId: createFileUploads
-      description: Initiates a file upload session
-      parameters:
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/Authorization'
-      requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateFileUploadRequest'
+              $ref: '#/components/schemas/UpdatePageRequest'
             examples:
-              create:
-                $ref: '#/components/examples/CreateFileUploadRequestExample'
-      responses:
-        '200':
-          description: File upload created successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUpload'
-              examples:
-                created:
-                  $ref: '#/components/examples/FileUploadExample'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-    get:
-      tags:
-        - File Uploads
-      summary: Retrieve File-uploads
-      operationId: retrieveFileUploads
-      description: Returns a paginated list of file uploads
-      parameters:
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/StartCursor'
-        - $ref: '#/components/parameters/PageSize'
-        - $ref: '#/components/parameters/Authorization'
-      responses:
-        '200':
-          description: File uploads retrieved successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUploadsResponse'
-              examples:
-                uploads:
-                  $ref: '#/components/examples/FileUploadsResponseExample'
-          x-microcks-refs:
-            - success
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /file-uploads/{file_upload_id}:
-    get:
-      operationId: retrieveFileUploads
-      summary: Retrieve File-uploads
-      tags:
-        - File Uploads
-      parameters:
-        - $ref: '#/components/parameters/FileUploadId'
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/Authorization'
-      responses:
-        '200':
-          description: File upload retrieved successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUpload'
-              examples:
-                success:
-                  $ref: '#/components/examples/FileUploadSuccess'
-          x-microcks-refs:
-            - success
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /file-uploads/{file_upload_id}/send:
-    post:
-      operationId: createFileUploadsSen
-      summary: Create File-uploads Sen
-      tags:
-        - File Uploads
-      parameters:
-        - $ref: '#/components/parameters/FileUploadId'
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/Authorization'
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/SendFileUploadRequest'
-      responses:
-        '200':
-          description: File uploaded successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUpload'
-              examples:
-                success:
-                  $ref: '#/components/examples/FileUploadSuccess'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /file-uploads/{file_upload_id}/complete:
-    post:
-      operationId: createFileUploadsComplet
-      summary: Create File-uploads Complet
-      tags:
-        - File Uploads
-      parameters:
-        - $ref: '#/components/parameters/FileUploadId'
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/Authorization'
-      responses:
-        '200':
-          description: File upload completed successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUpload'
-              examples:
-                success:
-                  $ref: '#/components/examples/FileUploadCompleted'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /files/uploads:
-    post:
-      tags:
-        - File Uploads
-      summary: Create Files Uploads
-      operationId: createFilesUploads
-      description: Initiates a file upload session
-      parameters:
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/Authorization'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateFileUploadRequest'
-            examples:
-              imageUpload:
-                $ref: '#/components/examples/CreateFileUploadExample'
-      responses:
-        '200':
-          description: File upload session created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUpload'
-              examples:
-                created:
-                  $ref: '#/components/examples/FileUploadExample'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-    get:
-      tags:
-        - File Uploads
-      summary: Retrieve Files Uploads
-      operationId: retrieveFilesUploads
-      description: Lists file uploads with pagination
-      parameters:
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/StartCursor'
-        - $ref: '#/components/parameters/PageSize'
-        - $ref: '#/components/parameters/Authorization'
-      responses:
-        '200':
-          description: File uploads retrieved
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUploadListResponse'
-              examples:
-                uploads:
-                  $ref: '#/components/examples/FileUploadListExample'
-          x-microcks-refs:
-            - success
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /files/uploads/{upload_id}:
-    parameters:
-      - $ref: '#/components/parameters/UploadId'
-      - $ref: '#/components/parameters/NotionVersion'
-    get:
-      tags:
-        - File Uploads
-      summary: Retrieve Files Uploads
-      operationId: retrieveFilesUploads
-      description: Retrieves a file upload by ID
-      responses:
-        '200':
-          description: File upload retrieved
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUpload'
-              examples:
-                upload:
-                  $ref: '#/components/examples/FileUploadExample'
-          x-microcks-refs:
-            - success
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-      parameters:
-        - $ref: '#/components/parameters/Authorization'
-  /files/uploads/{upload_id}/complete:
-    parameters:
-      - $ref: '#/components/parameters/UploadId'
-      - $ref: '#/components/parameters/NotionVersion'
-    post:
-      tags:
-        - File Uploads
-      summary: Create Files Uploads Complet
-      operationId: createFilesUploadsComplet
-      description: Finalizes a file upload session
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CompleteFileUploadRequest'
-            examples:
-              complete:
-                $ref: '#/components/examples/CompleteFileUploadExample'
-      responses:
-        '200':
-          description: File upload completed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUpload'
-              examples:
-                completed:
-                  $ref: '#/components/examples/FileUploadCompletedExample'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-      parameters:
-        - $ref: '#/components/parameters/Authorization'
-  /files/upload:
-    post:
-      summary: Create Files Upload
-      description: Create a new file upload to Notion
-      operationId: createFilesUpload
-      tags:
-        - File Uploads
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateFileUploadRequest'
-            examples:
-              imageUpload:
-                summary: Image file upload
+              updateProperties:
                 value:
-                  filename: profile-photo.jpg
-                  content_type: image/jpeg
-                  size: 524288
-      responses:
-        '200':
-          description: File upload created successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUploadResponse'
-              examples:
-                successfulUpload:
-                  summary: Successful file upload creation
-                  value:
-                    object: file_upload
-                    id: 43833259-72ae-404e-8441-b6577f3159b4
-                    status: pending
-                    filename: profile-photo.jpg
-                    content_type: image/jpeg
-                    size: 524288
-                    upload_url: https://upload.notion.com/...
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequestError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '429':
-          $ref: '#/components/responses/RateLimitError'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-      parameters:
-        - $ref: '#/components/parameters/Authorization'
-  /files/upload/{upload_id}/send:
-    post:
-      operationId: createFilesUploadSen
-      summary: Create Files Upload Sen
-      description: |
-        Sends the actual file content to a previously created file upload.
-        The content must be sent as multipart/form-data.
-      tags:
-        - File Uploads
-      parameters:
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/UploadId'
-        - $ref: '#/components/parameters/Authorization'
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              required:
-                - file
-              properties:
-                file:
-                  type: string
-                  format: binary
-                  description: The file content to upload
-            examples:
-              imageFile:
-                summary: Image file upload
+                  properties:
+                    Name:
+                      title:
+                        - text:
+                            content: Updated Title
+              archivePage:
                 value:
-                  file: '[binary image data]'
+                  archived: true
       responses:
         '200':
-          description: File content sent successfully
+          description: Page updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FileUploadObject'
+                $ref: '#/components/schemas/Page'
               examples:
-                uploadSent:
-                  $ref: '#/components/examples/FileUploadSentResponse'
+                updatedPage:
+                  $ref: '#/components/examples/SimplePage'
           x-microcks-refs:
             - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/RateLimitExceeded'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /files/upload/{upload_id}/complete:
-    post:
-      summary: Create Files Upload Complet
-      description: Finalize the file upload process
-      operationId: createFilesUploadComplet
-      tags:
-        - File Uploads
-      parameters:
-        - $ref: '#/components/parameters/UploadIdParam'
-        - $ref: '#/components/parameters/Authorization'
-      responses:
-        '200':
-          description: File upload completed successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUploadResponse'
-              examples:
-                completedUpload:
-                  summary: Completed upload
-                  value:
-                    object: file_upload
-                    id: 43833259-72ae-404e-8441-b6577f3159b4
-                    status: uploaded
-                    filename: report.xlsx
-          x-microcks-refs:
-            - success
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /files/upload/{upload_id}:
-    post:
-      summary: Create Files Upload
-      description: Upload file content to the upload URL
-      operationId: createFilesUpload
-      tags:
-        - File Uploads
-      parameters:
-        - $ref: '#/components/parameters/UploadIdParam'
-        - $ref: '#/components/parameters/Authorization'
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                file:
-                  type: string
-                  format: binary
-            examples:
-              imageFile:
-                summary: Upload image file
-      responses:
-        '200':
-          description: File content uploaded successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUploadResponse'
-              examples:
-                uploadComplete:
-                  summary: Upload completed
-                  value:
-                    object: file_upload
-                    id: 43833259-72ae-404e-8441-b6577f3159b4
-                    status: uploaded
-          x-microcks-refs:
-            - success
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-    get:
-      summary: Retrieve Files Upload
-      description: Get the status and metadata of a file upload
-      operationId: retrieveFilesUpload
-      tags:
-        - File Uploads
-      parameters:
-        - $ref: '#/components/parameters/UploadIdParam'
-        - $ref: '#/components/parameters/Authorization'
-      responses:
-        '200':
-          description: File upload retrieved successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUploadResponse'
-              examples:
-                pendingUpload:
-                  summary: Pending upload
-                  value:
-                    object: file_upload
-                    id: 43833259-72ae-404e-8441-b6577f3159b4
-                    status: pending
-                    filename: document.pdf
-                uploadedFile:
-                  summary: Uploaded file
-                  value:
-                    object: file_upload
-                    id: 43833259-72ae-404e-8441-b6577f3159b4
-                    status: uploaded
-                    filename: document.pdf
-          x-microcks-refs:
-            - success
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /file_uploads/{file_upload_id}/upload:
-    post:
-      summary: Create File Uploads Uploa
-      description: Uploads file content to a pending file upload
-      operationId: createFileUploadsUploa
-      tags:
-        - File Uploads
-      parameters:
-        - name: file_upload_id
-          in: path
-          required: true
-          description: The ID of the file upload
-          schema:
-            type: string
-            format: uuid
-        - $ref: '#/components/parameters/Authorization'
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/SendFileUploadRequest'
-            examples:
-              singlePartFile:
-                $ref: '#/components/examples/SendFileUploadSinglePart'
-              multiPartSegment:
-                $ref: '#/components/examples/SendFileUploadMultiPart'
-      responses:
-        '200':
-          description: File content uploaded successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUpload'
-              examples:
-                uploadComplete:
-                  $ref: '#/components/examples/FileUploadUploaded'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/RateLimited'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /files/{file_upload_id}:
-    get:
-      tags:
-        - File Uploads
-      operationId: retrieveFiles
-      summary: Retrieve Files
-      description: Get details about a specific file upload by its ID
-      parameters:
-        - $ref: '#/components/parameters/NotionVersionHeader'
-        - name: file_upload_id
-          in: path
-          required: true
-          description: UUID of the file upload
-          schema:
-            type: string
-            format: uuid
-          example: 43833259-72ae-404e-8441-b6577f3159b4
-        - $ref: '#/components/parameters/Authorization'
-      responses:
-        '200':
-          description: File upload retrieved successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUploadObject'
-              examples:
-                uploaded:
-                  $ref: '#/components/examples/FileUploadUploadedExample'
-                pending:
-                  $ref: '#/components/examples/FileUploadPendingExample'
-          x-microcks-refs:
-            - success
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /files/{file_upload_id}/send:
-    post:
-      tags:
-        - File Uploads
-      operationId: createFilesSen
-      summary: Create Files Sen
-      description: >-
-        Upload the actual file content to a previously created file upload
-        session
-      parameters:
-        - $ref: '#/components/parameters/NotionVersionHeader'
-        - name: file_upload_id
-          in: path
-          required: true
-          description: UUID of the file upload
-          schema:
-            type: string
-            format: uuid
-        - $ref: '#/components/parameters/Authorization'
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/SendFileUploadRequest'
-      responses:
-        '200':
-          description: File content uploaded successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUploadObject'
-              examples:
-                success:
-                  $ref: '#/components/examples/FileUploadSentExample'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /files/{file_upload_id}/complete:
-    post:
-      tags:
-        - File Uploads
-      operationId: createFilesComplet
-      summary: Create Files Complet
-      description: Finalize the file upload after sending all content
-      parameters:
-        - $ref: '#/components/parameters/NotionVersionHeader'
-        - name: file_upload_id
-          in: path
-          required: true
-          description: UUID of the file upload
-          schema:
-            type: string
-            format: uuid
-        - $ref: '#/components/parameters/Authorization'
-      responses:
-        '200':
-          description: File upload completed successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUploadObject'
-              examples:
-                completed:
-                  $ref: '#/components/examples/FileUploadCompletedExample'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /files/uploads/{upload_id}/send:
-    parameters:
-      - $ref: '#/components/parameters/UploadId'
-      - $ref: '#/components/parameters/NotionVersion'
-    post:
-      tags:
-        - File Uploads
-      summary: Create Files Uploads Sen
-      operationId: createFilesUploadsSen
-      description: Sends file data to an upload session
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                file:
-                  type: string
-                  format: binary
-      responses:
-        '200':
-          description: File data uploaded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUpload'
-              examples:
-                uploaded:
-                  $ref: '#/components/examples/FileUploadExample'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-      parameters:
-        - $ref: '#/components/parameters/Authorization'
-  /example-endpoint:
-    get:
-      summary: Retrieve Example-endpoint
-      description: >-
-        This is a representative endpoint demonstrating all possible HTTP status
-        codes and error responses
-      operationId: retrieveExampleEndpoint
-      parameters:
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/Authorization'
-      security:
-        - BearerAuth: []
-      responses:
-        '200':
-          $ref: '#/components/responses/Success'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
         '429':
           $ref: '#/components/responses/RateLimited'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-        '502':
-          $ref: '#/components/responses/BadGateway'
-        '503':
-          $ref: '#/components/responses/ServiceUnavailable'
-        '504':
-          $ref: '#/components/responses/GatewayTimeout'
       x-naftiko:
         GenerateOperationSummariesFromPath: true
         CaselCaseOperationIds: true
         AddedMicrocksOperations: true
         AddedMicrocksRefs: true
+        AddBearerAuthtoOperations: true
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
         dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+      security:
+        - bearerHttpAuthentication: []
+
+  /search:
+    post:
+      summary: Create Search
+      operationId: createSearch
+      tags:
+        - Search
+      parameters:
+        - $ref: '#/components/parameters/NotionVersionHeader'
+        - $ref: '#/components/parameters/Authorization'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRequest'
+            examples:
+              searchAll:
+                value: {}
+              searchByQuery:
+                value:
+                  query: meeting notes
+              searchPagesOnly:
+                value:
+                  filter:
+                    value: page
+                    property: object
+              searchWithSort:
+                value:
+                  query: project
+                  sort:
+                    direction: descending
+                    timestamp: last_edited_time
+      responses:
+        '200':
+          description: Search executed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+              examples:
+                searchResults:
+                  value:
+                    object: list
+                    results:
+                      - object: page
+                        id: 59833787-2cf9-4fdf-8782-e53db20768a5
+                        properties:
+                          title:
+                            title:
+                              - text:
+                                  content: Meeting Notes
+                      - object: database
+                        id: 668d797c-76fa-4934-9b05-ad288df2d136
+                        title:
+                          - text:
+                              content: Projects Database
+                    has_more: false
+                    next_cursor: null
+                    type: page_or_database
+          x-microcks-refs:
+            - success
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+      x-naftiko:
+        GenerateOperationSummariesFromPath: true
+        CaselCaseOperationIds: true
+        AddedMicrocksOperations: true
+        AddedMicrocksRefs: true
+        AddBearerAuthtoOperations: true
+        AddAuthorizationHeaderParameterToOperations: true
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+      security:
+        - bearerHttpAuthentication: []
+
+
   /unfurl:
     post:
       summary: Create Unfurl
@@ -3942,31 +1805,107 @@ paths:
         dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
       security:
         - bearerHttpAuthentication: []
-  /file-uploads/{upload_id}:
+        
+  /users:
     get:
+      summary: Retrieve Users
+      operationId: retrieveUsers
       tags:
-        - File Uploads
-      summary: Retrieve File-uploads
-      operationId: retrieveFileUploads
-      description: Retrieves a file upload object using its ID
+        - Users
       parameters:
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/UploadId'
+        - $ref: '#/components/parameters/NotionVersionHeader'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/StartCursor'
         - $ref: '#/components/parameters/Authorization'
       responses:
         '200':
-          description: File upload retrieved successfully
+          description: Successfully retrieved users
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FileUpload'
+                $ref: '#/components/schemas/UsersList'
               examples:
-                upload:
-                  $ref: '#/components/examples/FileUploadExample'
+                usersList:
+                  value:
+                    object: list
+                    results:
+                      - object: user
+                        id: 71e95936-2737-4e11-b03d-f174f6f13e90
+                        type: person
+                        name: Jane Doe
+                        avatar_url: https://example.com/avatar.jpg
+                        person:
+                          email: jane@example.com
+                      - object: user
+                        id: b8d9c9d5-b8a4-4f11-8f7c-8e5c6d4a3b2c
+                        type: bot
+                        name: My Integration
+                        bot:
+                          owner:
+                            type: workspace
+                          workspace_name: My Workspace
+                    has_more: false
+                    next_cursor: null
+                    type: user
           x-microcks-refs:
             - success
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      x-naftiko:
+        GenerateOperationSummariesFromPath: true
+        CaselCaseOperationIds: true
+        AddedMicrocksOperations: true
+        AddedMicrocksRefs: true
+        AddBearerAuthtoOperations: true
+        AddAuthorizationHeaderParameterToOperations: true
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+      security:
+        - bearerHttpAuthentication: []
+  /users/{user_id}:
+    get:
+      summary: Retrieve Users
+      operationId: retrieveUsers
+      tags:
+        - Users
+      parameters:
+        - $ref: '#/components/parameters/NotionVersionHeader'
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+          description: User identifier
+        - $ref: '#/components/parameters/Authorization'
+      responses:
+        '200':
+          description: Successfully retrieved user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                personUser:
+                  $ref: '#/components/examples/PersonUser'
+                botUser:
+                  $ref: '#/components/examples/BotUser'
+          x-microcks-refs:
+            - success
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
       x-naftiko:
         GenerateOperationSummariesFromPath: true
         CaselCaseOperationIds: true
@@ -3979,38 +1918,31 @@ paths:
         dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
       security:
         - bearerHttpAuthentication: []
-  /file-uploads/{upload_id}/send:
-    post:
+  /users/me:
+    get:
+      summary: Retrieve Users Me
+      operationId: retrieveUsersMe
       tags:
-        - File Uploads
-      summary: Create File-uploads Sen
-      operationId: createFileUploadsSen
-      description: Sends file data for an upload session
+        - Users
       parameters:
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/UploadId'
+        - $ref: '#/components/parameters/NotionVersionHeader'
         - $ref: '#/components/parameters/Authorization'
-      requestBody:
-        required: true
-        content:
-          application/octet-stream:
-            schema:
-              type: string
-              format: binary
       responses:
         '200':
-          description: File data sent successfully
+          description: Successfully retrieved bot user
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FileUpload'
+                $ref: '#/components/schemas/User'
               examples:
-                sent:
-                  $ref: '#/components/examples/FileUploadExample'
+                botUser:
+                  $ref: '#/components/examples/BotUser'
           x-microcks-refs:
             - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
       x-naftiko:
         GenerateOperationSummariesFromPath: true
         CaselCaseOperationIds: true
@@ -4023,52 +1955,7 @@ paths:
         dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
       security:
         - bearerHttpAuthentication: []
-  /file-uploads/{upload_id}/complete:
-    post:
-      tags:
-        - File Uploads
-      summary: Create File-uploads Complet
-      operationId: createFileUploadsComplet
-      description: Completes a file upload session
-      parameters:
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/UploadId'
-        - $ref: '#/components/parameters/Authorization'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CompleteFileUploadRequest'
-            examples:
-              complete:
-                $ref: '#/components/examples/CompleteFileUploadRequestExample'
-      responses:
-        '200':
-          description: File upload completed successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUpload'
-              examples:
-                completed:
-                  $ref: '#/components/examples/FileUploadExample'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
+
   /webhook/events:
     post:
       tags:
@@ -4185,65 +2072,7 @@ paths:
         - bearerHttpAuthentication: []
       parameters:
         - $ref: '#/components/parameters/Authorization'
-  /file_uploads/{file_upload_id}/parts:
-    post:
-      tags:
-        - File Uploads
-      summary: Create File Uploads Part
-      description: >
-        Uploads file data. For single-part uploads (≤20MB), this completes the
-        upload.
 
-        For multi-part uploads, call multiple times with different part numbers.
-      operationId: createFileUploadsPart
-      parameters:
-        - $ref: '#/components/parameters/NotionVersion'
-        - name: file_upload_id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - $ref: '#/components/parameters/Authorization'
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/SendFileUploadRequest'
-            examples:
-              singlePart:
-                $ref: '#/components/examples/SendSinglePartExample'
-              multiPart:
-                $ref: '#/components/examples/SendMultiPartExample'
-      responses:
-        '200':
-          description: File part uploaded successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FileUploadResponse'
-              examples:
-                uploadComplete:
-                  $ref: '#/components/examples/UploadCompleteResponse'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '413':
-          $ref: '#/components/responses/PayloadTooLarge'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
 webhooks:
   blockUpdated:
     post:
@@ -15030,7 +12859,7 @@ components:
         format: uuid
       description: The database ID
     DataSourceId:
-      name: datasource_id
+      name: data_source_id
       in: path
       required: true
       schema:
