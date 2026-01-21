@@ -68,10 +68,12 @@ These are all of the available operations in this sandbox, providing a complete 
 ## Backstage
 We provide a Backstage software catalog entity for the Notion API Sandbox, allowing this sandbox to be registered with any catalog, making it discoverable by team and across an organization--allowing anyone to fork and deploy locally within the enterprise.
 
-## Work
-This is just the initial draft of this repository, and there is more work to be done to make it deliver everything possible using these open-source specifications and tooling:
+## Open Work
+This is the current work on the table to keep improving this sandbox, but it is currently 100% functional and ready to use, but will be even better once we tackle the work on this list.
 
-- **Examples** - More work is needed to continue refining the available examples and make them reflect different business scenarios.
+- **Examples** - Continue refining the available examples and make them reflect different business scenarios, and industries.
+- **Tests** - Setup a test suite to run automated test against each of the operations, ensuring that each mock operation works.
+- **Documentation** - What can we use alongside Microcks, Bruno, and Backstage to help any user see the operations and schema.
 - **What Else?** - What else can we do with this sandbox to make it easier to use as part of integration into any developoment workflow.
 
 ## Support
