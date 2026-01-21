@@ -74,6 +74,7 @@ This is the current work on the table to keep improving this sandbox, but it is 
 - **Examples** - Continue refining the available examples and make them reflect different business scenarios, and industries.
 - **Tests** - Setup a test suite to run automated test against each of the operations, ensuring that each mock operation works.
 - **Documentation** - What can we use alongside Microcks, Bruno, and Backstage to help any user see the operations and schema.
+- **Un-Happy Paths** - Need to document and continue to standardize how you trigger the un-happy paths for each operation.
 - **What Else?** - What else can we do with this sandbox to make it easier to use as part of integration into any developoment workflow.
 
 ## Support
