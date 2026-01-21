@@ -6,7 +6,7 @@ naftiko:
 info:
 
   name: Notion Sandbox
-  description: This is a Notion sandbox that uses OpenAPI, Microcks, and Bruno to provide a 3rd-pary API sandbox for Notion.
+  description: This is a Notion sandbox that uses OpenAPI, Microcks, and Bruno to provide a 3rd-party API sandbox for Notion.
 
   tags:
 
@@ -23,15 +23,7 @@ ports:
       description: Provides a composite HTTP API.
       openApi:
 
-        - $ref: 'openapi/notion-sandbox.yml'  
-
-  artificialIntelligence:
-
-    - adapter: MCP
-      title: API Reusability MCP
-      jsonSchema:
-
-        - $ref: model-context-protocol/notion-sandbox-mcp.yml'            
+        - $ref: 'openapi/notion-openapi.yml'      
 
 virtualization:
 
@@ -47,10 +39,10 @@ virtualization:
 
 metrics:
 
-  numberOfPaths: 29
-  numberOfOperations: 37
+  numberOfPaths: 26
+  numberOfOperations: 34
   numberOfReadOperations: 14
-  numberOfWriteOperations: 23
+  numberOfWriteOperations: 20
   numberOfSchemas: 127
   numberOfResponses: 9
   numberOfParameters: 12
@@ -129,11 +121,7 @@ services:
     loginUrl: https://www.notion.so/login
     signUpUrl: https://www.notion.so/signup
     termsOfServiceUrl: https://www.notion.so/terms
-    privacyPolicyUrl: https://privacycenter.notion.so/policies
-    plans:
-      - $ref: 'api-commons/plans-notion.yml'    
-    rateLimits:
-      - $ref: 'api-commons/rate-limits-notion.yml'                                        
+    privacyPolicyUrl: https://privacycenter.notion.so/policies                                   
 
 observability: 
 
