@@ -1,38 +1,48 @@
 meta {
-  name: Retrieve Pages
+  name: Create File Uploads Send
   type: http
   seq: 4
 }
 
-get {
-  url: {{baseUrl}}/pages/:page_id
-  body: none
+post {
+  url: {{baseUrl}}/file_uploads/:file_upload_id/send
+  body: multipartForm
   auth: inherit
 }
 
 params:path {
-  page_id: 1
+  file_upload_id: b52b8ed6-e029-4707-a671-832549c09de3
 }
 
 headers {
-  Notion-Version: 
-  Authorization: 
+  Notion-Version: {{notionVersion}}
+  Authorization: Bearer {{notionToken}}
+}
+
+body:multipart-form {
+  file: 
+  part_number: 
 }
 
 example {
-  name: page
+  name: Completed file upload (Upload image file)
   
   request: {
-    url: {{baseUrl}}/pages/:page_id
-    method: GET
-    mode: none
+    url: {{baseUrl}}/file_uploads/:file_upload_id/send
+    method: POST
+    mode: multipartForm
     params:path: {
-      page_id: 
+      file_upload_id: 
     }
   
     headers: {
       Notion-Version: 
       Authorization: 
+    }
+  
+    body:multipart-form: {
+      file: 
+      part_number: 
     }
   }
   
@@ -50,51 +60,17 @@ example {
       type: json
       content: '''
         {
-          "object": "page",
-          "id": "59833787-2cf9-4fdf-8782-e53db20768a5",
-          "created_time": "2023-01-15T10:30:00.000Z",
-          "last_edited_time": "2023-01-16T14:22:00.000Z",
-          "created_by": {
-            "object": "user",
-            "id": "71e95936-2737-4e11-b03d-f174f6f13e90"
-          },
-          "last_edited_by": {
-            "object": "user",
-            "id": "71e95936-2737-4e11-b03d-f174f6f13e90"
-          },
+          "object": "file_upload",
+          "id": "a3f9d3e2-1abc-42de-b904-badc0ffee000",
+          "created_time": "2025-04-09T22:26:00.000Z",
+          "last_edited_time": "2025-04-09T22:27:00.000Z",
+          "expiry_time": "2025-04-09T23:26:00.000Z",
           "archived": false,
-          "icon": {
-            "type": "emoji",
-            "emoji": "📄"
-          },
-          "cover": null,
-          "parent": {
-            "type": "database_id",
-            "database_id": "668d797c-76fa-4934-9b05-ad288df2d136"
-          },
-          "properties": {
-            "Name": {
-              "title": [
-                {
-                  "type": "text",
-                  "text": {
-                    "content": "My Page Title"
-                  },
-                  "plain_text": "My Page Title",
-                  "annotations": {
-                    "bold": false,
-                    "italic": false,
-                    "strikethrough": false,
-                    "underline": false,
-                    "code": false,
-                    "color": "default"
-                  }
-                }
-              ]
-            }
-          },
-          "url": "https://www.notion.so/My-Page-Title-59833787",
-          "public_url": null
+          "status": "uploaded",
+          "filename": "Really funny.gif",
+          "content_type": "image/gif",
+          "content_length": "4435",
+          "request_id": "91a4ee8c-61f6-4c27-bd41-09aa35299929"
         }
       '''
     }
@@ -102,19 +78,24 @@ example {
 }
 
 example {
-  name: invalidRequest
+  name: invalidRequest (Upload image file)
   
   request: {
-    url: {{baseUrl}}/pages/:page_id
-    method: GET
-    mode: none
+    url: {{baseUrl}}/file_uploads/:file_upload_id/send
+    method: POST
+    mode: multipartForm
     params:path: {
-      page_id: 
+      file_upload_id: 
     }
   
     headers: {
       Notion-Version: 
       Authorization: 
+    }
+  
+    body:multipart-form: {
+      file: 
+      part_number: 
     }
   }
   
@@ -143,19 +124,24 @@ example {
 }
 
 example {
-  name: unauthorized
+  name: unauthorized (Upload image file)
   
   request: {
-    url: {{baseUrl}}/pages/:page_id
-    method: GET
-    mode: none
+    url: {{baseUrl}}/file_uploads/:file_upload_id/send
+    method: POST
+    mode: multipartForm
     params:path: {
-      page_id: 
+      file_upload_id: 
     }
   
     headers: {
       Notion-Version: 
       Authorization: 
+    }
+  
+    body:multipart-form: {
+      file: 
+      part_number: 
     }
   }
   
@@ -184,19 +170,24 @@ example {
 }
 
 example {
-  name: notFound
+  name: notFound (Upload image file)
   
   request: {
-    url: {{baseUrl}}/pages/:page_id
-    method: GET
-    mode: none
+    url: {{baseUrl}}/file_uploads/:file_upload_id/send
+    method: POST
+    mode: multipartForm
     params:path: {
-      page_id: 
+      file_upload_id: 
     }
   
     headers: {
       Notion-Version: 
       Authorization: 
+    }
+  
+    body:multipart-form: {
+      file: 
+      part_number: 
     }
   }
   
@@ -225,19 +216,25 @@ example {
 }
 
 example {
-  name: rateLimited
+  name: 413 Response (Upload image file)
+  description: Payload too large
   
   request: {
-    url: {{baseUrl}}/pages/:page_id
-    method: GET
-    mode: none
+    url: {{baseUrl}}/file_uploads/:file_upload_id/send
+    method: POST
+    mode: multipartForm
     params:path: {
-      page_id: 
+      file_upload_id: 
     }
   
     headers: {
       Notion-Version: 
       Authorization: 
+    }
+  
+    body:multipart-form: {
+      file: 
+      part_number: 
     }
   }
   
@@ -247,8 +244,8 @@ example {
     }
   
     status: {
-      code: 429
-      text: Too Many Requests
+      code: 413
+      text: Payload Too Large
     }
   
     body: {
@@ -256,9 +253,9 @@ example {
       content: '''
         {
           "object": "error",
-          "status": 429,
-          "code": "rate_limited",
-          "message": "Rate limit exceeded"
+          "status": 413,
+          "code": "payload_too_large",
+          "message": "Part size exceeds maximum of 20971520 bytes"
         }
       '''
     }

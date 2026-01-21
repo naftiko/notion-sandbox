@@ -11,16 +11,15 @@ post {
 }
 
 headers {
-  Notion-Version: 
-  Authorization: 
+  Notion-Version: {{notionVersion}}
+  Authorization: Bearer {{notionToken}}
 }
 
 body:json {
   {
-    "filename": "",
-    "file_size_bytes": 0,
-    "mime_type": "",
-    "part_size_bytes": 0
+    "filename": "company-logo.png",
+    "file_size_bytes": 1048576,
+    "mime_type": "image/png"
   }
 }
 

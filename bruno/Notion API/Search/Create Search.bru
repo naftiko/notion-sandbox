@@ -11,24 +11,22 @@ post {
 }
 
 headers {
-  Notion-Version: 1234
-  Authorization: 1234
+  Notion-Version: {{notionVersion}}
+  Authorization: Bearer {{notionToken}}
 }
 
 body:json {
   {
-    "query": "API",
-    "filter": {
-      "value": "",
-      "property": ""
-    },
-    "sort": {
-      "direction": "",
-      "timestamp": ""
-    },
-    "start_cursor": "",
-    "page_size": 0
-  }
+      "query":"External tasks",
+      "filter": {
+          "value": "data_source",
+          "property": "object"
+      },
+      "sort":{
+        "direction":"ascending",
+        "timestamp":"last_edited_time"
+      }
+    }
 }
 
 example {

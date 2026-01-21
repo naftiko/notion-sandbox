@@ -11,13 +11,13 @@ get {
 }
 
 params:query {
-  ~page_size: 
+  ~page_size: 1000
   ~start_cursor: 
 }
 
 headers {
-  Notion-Version: 
-  Authorization: 
+  Notion-Version: {{notionVersion}}
+  Authorization: Bearer {{notionToken}}
 }
 
 example {

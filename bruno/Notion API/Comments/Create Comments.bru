@@ -11,38 +11,23 @@ post {
 }
 
 headers {
-  Notion-Version: 
-  Authorization: 
+  Notion-Version: {{notionVersion}}
+  Authorization: Bearer {{notionToken}}
 }
 
 body:json {
   {
-    "parent": {
-      "page_id": ""
-    },
-    "discussion_id": "",
-    "rich_text": [
-      {
-        "type": "",
-        "plain_text": "",
-        "href": "",
-        "annotations": {
-          "bold": false,
-          "italic": false,
-          "strikethrough": false,
-          "underline": false,
-          "code": false,
-          "color": ""
-        },
-        "text": {
-          "content": "",
-          "link": {
-            "url": ""
+      "parent": {
+        "page_id": "5c6a28216bb14a7eb6e1c50111515c3d"
+      },
+      "rich_text": [
+        {
+          "text": {
+            "content": "This is a comment on the page"
           }
         }
-      }
-    ]
-  }
+      ]
+    }
 }
 
 example {

@@ -1,5 +1,5 @@
 meta {
-  name: Patch Blocks Childre
+  name: Patch Blocks Children
   type: http
   seq: 5
 }
@@ -11,41 +11,38 @@ patch {
 }
 
 params:path {
-  block_id: 11
+  block_id: 550e8400-e29b-41d4-a716-446655440000
 }
 
 headers {
-  Notion-Version: 
-  Authorization: 
+  Notion-Version: {{notionVersion}}
+  Authorization: Bearer {{notionToken}}
 }
 
 body:json {
   {
     "children": [
       {
-        "object": "",
-        "id": "",
-        "type": "",
-        "created_time": "",
-        "created_by": {
-          "object": "",
-          "id": "",
-          "type": "",
-          "name": "",
-          "avatar_url": "",
-          "person": {
-            "email": ""
-          },
-          "bot": {
-            "owner": {},
-            "workspace_name": ""
-          }
-        },
-        "last_edited_time": "",
-        "last_edited_by": {},
-        "archived": false,
-        "has_children": false,
-        "parent": {}
+        "object": "block",
+        "type": "heading_2",
+        "heading_2": {
+          "rich_text": [{ "type": "text", "text": { "content": "Lacinato kale" } }]
+        }
+      },
+      {
+        "object": "block",
+        "type": "paragraph",
+        "paragraph": {
+          "rich_text": [
+            {
+              "type": "text",
+              "text": {
+                "content": "Lacinato kale is a variety of kale with a long tradition in Italian cuisine, especially that of Tuscany. It is also known as Tuscan kale, Italian kale, dinosaur kale, kale, flat back kale, palm tree kale, or black Tuscan palm.",
+                "link": { "url": "https://en.wikipedia.org/wiki/Lacinato_kale" }
+              }
+            }
+          ]
+        }
       }
     ]
   }

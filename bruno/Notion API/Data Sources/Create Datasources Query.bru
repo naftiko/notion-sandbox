@@ -1,5 +1,5 @@
 meta {
-  name: Create Datasources Quer
+  name: Create Datasources Query
   type: http
   seq: 4
 }
@@ -11,12 +11,12 @@ post {
 }
 
 params:path {
-  data_source_id: 
+  data_source_id: b55c9c91-384d-452b-81db-d1ef79372b75
 }
 
 headers {
-  Notion-Version: 
-  Authorization: 
+  Notion-Version: {{notionVersion}}
+  Authorization: Bearer {{notionToken}}
 }
 
 body:json {

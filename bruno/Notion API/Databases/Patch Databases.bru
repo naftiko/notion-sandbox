@@ -11,43 +11,24 @@ patch {
 }
 
 params:path {
-  database_id: 
+  database_id: 248104cd-477e-80fd-b757-e945d38000bd
 }
 
 headers {
-  Notion-Version: 
-  Authorization: 
+  Notion-Version: {{notionVersion}}
+  Authorization: Bearer {{notionToken}}
 }
 
 body:json {
   {
     "title": [
       {
-        "type": "",
-        "plain_text": "",
-        "href": "",
-        "annotations": {
-          "bold": false,
-          "italic": false,
-          "strikethrough": false,
-          "underline": false,
-          "code": false,
-          "color": ""
-        },
+        "type": "text",
         "text": {
-          "content": "",
-          "link": {
-            "url": ""
-          }
+          "content": "Updated Database Title"
         }
       }
-    ],
-    "description": [
-      {}
-    ],
-    "properties": {},
-    "icon": "",
-    "cover": ""
+    ]
   }
 }
 

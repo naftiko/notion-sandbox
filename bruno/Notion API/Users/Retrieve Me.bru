@@ -1,5 +1,5 @@
 meta {
-  name: Retrieve Users Me
+  name: Retrieve Me
   type: http
   seq: 3
 }
@@ -11,8 +11,8 @@ get {
 }
 
 headers {
-  Notion-Version: 
-  Authorization: 
+  Notion-Version: {{notionVersion}}
+  Authorization: Bearer {{notionToken}}
 }
 
 example {

@@ -11,39 +11,22 @@ patch {
 }
 
 params:path {
-  block_id: 11
+  block_id: 550e8400-e29b-41d4-a716-446655440000-rate-limited
 }
 
 headers {
-  Notion-Version: 
-  Authorization: 
+  Notion-Version: {{notionVersion}}
+  Authorization: Bearer {{notionToken}}
 }
 
 body:json {
   {
-    "object": "",
-    "id": "",
-    "type": "",
-    "created_time": "",
-    "created_by": {
-      "object": "",
-      "id": "",
-      "type": "",
-      "name": "",
-      "avatar_url": "",
-      "person": {
-        "email": ""
-      },
-      "bot": {
-        "owner": {},
-        "workspace_name": ""
-      }
-    },
-    "last_edited_time": "",
-    "last_edited_by": {},
-    "archived": false,
-    "has_children": false,
-    "parent": {}
+    "to_do": {
+      "rich_text": [{ 
+        "text": { "content": "Lacinato kale" } 
+        }],
+      "checked": false
+    }
   }
 }
 
