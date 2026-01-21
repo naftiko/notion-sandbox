@@ -6,10 +6,19 @@ meta {
 
 post {
   url: {{baseUrl}}/oauth/token
-  body: none
+  body: json
   auth: inherit
 }
 
 headers {
-  Authorization: 
+  Content-Type: application/json
+  Authorization: Bearer {{notionToken}}
+}
+
+body:json {
+  {
+    "grant_type": "authorization_code",
+    "code": "abc123",
+    "redirect_uri": "https://example.com/callback"
+  }
 }

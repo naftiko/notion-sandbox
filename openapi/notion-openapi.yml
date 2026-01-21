@@ -2,12 +2,18 @@ openapi: 3.1.0
 info:
   title: Notion API
   description: >
-    This is the sandbox OpenAPI for the Notion sandbox, providing a standardized interface that describes the Notion API, complete with examples and extensions to mock with Microcks, which can be worked with using Bruno API client.
-
-  version: 1.0.0
+    This is the sandbox OpenAPI for the Notion API, providing a standardized interface describing the Notion API, complete with examples and extensions to mock with Microcks, which can be used wuth Bruno the open-suorce API client.
+  version: 1.1.0
 tags:
   - name: Notion
+    description: Notion is an all-in-one workspace that combines notes, databases, wikis, project boards, and calendars into a single customizable platform for individuals and teams to organize their work.
+  - name: Productivity
+    description: Productivity apps are software tools designed to help individuals and teams work more efficiently by organizing tasks, managing time, facilitating collaboration, and streamlining workflows
+
 paths:
+
+  ## Authentication
+
   /oauth/token:
     post:
       operationId: createOauthToken
@@ -23,8 +29,21 @@ paths:
             schema:
               $ref: '#/components/schemas/TokenRequest'
             examples:
-              authorizationCode:
-                $ref: '#/components/examples/TokenRequestExample'
+              Success:
+                value:
+                  grant_type: authorization_code
+                  code: abc123
+                  redirect_uri: https://example.com/callback
+              BadRequest:
+                value:
+                  grant_type: invalid_grant
+                  code: ""
+                  redirect_uri: ""
+              Unauthorized:
+                value:
+                  grant_type: authorization_code
+                  code: abc123
+                  redirect_uri: https://example.com/callback
       responses:
         '200':
           description: Token created successfully
@@ -33,10 +52,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/TokenResponse'
               examples:
-                success:
+                Success:
                   $ref: '#/components/examples/TokenResponseExample'
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -49,7 +66,17 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }          
+          def body = new groovy.json.JsonSlurper().parseText(mockRequest.getRequestContent())          
+          if (body.grant_type != "authorization_code" || !body.code || !body.redirect_uri) {
+            return "BadRequest"
+          }          
+          return "Success"
       parameters:
         - $ref: '#/components/parameters/Authorization'
   /oauth/token/introspect:
@@ -66,8 +93,10 @@ paths:
             schema:
               $ref: '#/components/schemas/IntrospectRequest'
             examples:
-              introspect:
+              Success:
                 $ref: '#/components/examples/IntrospectRequestExample'
+              Unauthorized:
+                $ref: '#/components/examples/IntrospectResponseExample'      
       responses:
         '200':
           description: Token introspection successful
@@ -76,10 +105,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/IntrospectResponse'
               examples:
-                active:
+                Success:
                   $ref: '#/components/examples/IntrospectResponseExample'
-          x-microcks-refs:
-            - success
         '401':
           $ref: '#/components/responses/Unauthorized'
       x-naftiko:
@@ -91,7 +118,13 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                
+          return "Success"
       security:
         - bearerHttpAuthentication: []
       parameters:
@@ -109,8 +142,10 @@ paths:
             schema:
               $ref: '#/components/schemas/RevokeTokenRequest'
             examples:
-              default:
+              Success:
                 $ref: '#/components/examples/RevokeTokenRequest'
+              Unauthorized:
+                $ref: '#/components/examples/RevokeTokenResponseSuccess'              
       responses:
         '200':
           description: Token revoked successfully
@@ -119,10 +154,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/RevokeTokenResponse'
               examples:
-                success:
+                Success:
                   $ref: '#/components/examples/RevokeTokenResponseSuccess'
-          x-microcks-refs:
-            - success
         '401':
           $ref: '#/components/responses/Unauthorized'
       x-naftiko:
@@ -134,7 +167,13 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                
+          return "Success"
       security:
         - bearerHttpAuthentication: []
       parameters:
@@ -152,8 +191,10 @@ paths:
             schema:
               $ref: '#/components/schemas/RefreshTokenRequest'
             examples:
-              default:
+              Success:
                 $ref: '#/components/examples/RefreshTokenRequest'
+              Unauthorized:
+                $ref: '#/components/examples/TokenResponseSuccess'                 
       responses:
         '200':
           description: Token refreshed successfully
@@ -162,10 +203,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/TokenResponse'
               examples:
-                success:
+                Success:
                   $ref: '#/components/examples/TokenResponseSuccess'
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
       x-naftiko:
@@ -182,6 +221,10 @@ paths:
         - bearerHttpAuthentication: []
       parameters:
         - $ref: '#/components/parameters/Authorization'
+
+
+  ## Blocks
+
   /blocks/{block_id}:
     get:
       summary: Retrieve Blocks
@@ -195,6 +238,15 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/UUID'
+          examples:
+            Success:
+              value: '550e8400-e29b-41d4-a716-446655440000'
+            BadRequest:
+              value: '550e8400-e29b-41d4-a716-446655440000-bad-request'              
+            NotFound:
+              value: '550e8400-e29b-41d4-a716-446655440000-not-found'  
+            RateLimited:
+              value: '550e8400-e29b-41d4-a716-446655440000-rate-limited'                             
         - $ref: '#/components/parameters/Authorization'
       responses:
         '200':
@@ -204,10 +256,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Block'
               examples:
-                paragraphBlock:
+                Success:
                   $ref: '#/components/examples/ParagraphBlock'
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -225,7 +275,23 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def path = mockRequest.getRequest().getRequestURI();
+          if (path.contains("550e8400-e29b-41d4-a716-446655440000-bad")) {
+            return "BadRequest"
+          }               
+          if (path.contains("550e8400-e29b-41d4-a716-446655440000-not-found")) {
+            return "NotFound"
+          }   
+          if (path.contains("550e8400-e29b-41d4-a716-446655440000-rate-limited")) {
+            return "RateLimited"
+          }                      
+          return "Success"
       security:
         - bearerHttpAuthentication: []
     patch:
@@ -240,6 +306,15 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/UUID'
+          examples:
+            Success:
+              value: '550e8400-e29b-41d4-a716-446655440000'
+            BadRequest:
+              value: '550e8400-e29b-41d4-a716-446655440000-bad-request'              
+            NotFound:
+              value: '550e8400-e29b-41d4-a716-446655440000-not-found'  
+            RateLimited:
+              value: '550e8400-e29b-41d4-a716-446655440000-rate-limited'              
         - $ref: '#/components/parameters/Authorization'
       requestBody:
         required: true
@@ -248,13 +323,16 @@ paths:
             schema:
               $ref: '#/components/schemas/Block'
             examples:
-              updateParagraph:
+              Success:
                 value:
                   paragraph:
                     rich_text:
                       - type: text
                         text:
                           content: Updated paragraph text
+              NotFound:
+                value:
+                  paragraph: []                       
       responses:
         '200':
           description: Block updated successfully
@@ -263,10 +341,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Block'
               examples:
-                updatedBlock:
+                Success:
                   $ref: '#/components/examples/ParagraphBlock'
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -284,7 +360,23 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def path = mockRequest.getRequest().getRequestURI();
+          if (path.contains("550e8400-e29b-41d4-a716-446655440000-bad")) {
+            return "BadRequest"
+          }               
+          if (path.contains("550e8400-e29b-41d4-a716-446655440000-not-found")) {
+            return "NotFound"
+          }   
+          if (path.contains("550e8400-e29b-41d4-a716-446655440000-rate-limited")) {
+            return "RateLimited"
+          }                      
+          return "Success"
       security:
         - bearerHttpAuthentication: []
     delete:
@@ -299,6 +391,15 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/UUID'
+          examples:
+            Success:
+              value: '550e8400-e29b-41d4-a716-446655440000'
+            BadRequest:
+              value: '550e8400-e29b-41d4-a716-446655440000-bad-request'              
+            NotFound:
+              value: '550e8400-e29b-41d4-a716-446655440000-not-found'  
+            RateLimited:
+              value: '550e8400-e29b-41d4-a716-446655440000-rate-limited'               
         - $ref: '#/components/parameters/Authorization'
       responses:
         '200':
@@ -308,13 +409,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Block'
               examples:
-                deletedBlock:
+                Success:
                   value:
                     object: block
                     id: c02fc1d3-db8b-45c5-a222-27595b15aea7
                     archived: true
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -332,7 +431,23 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def path = mockRequest.getRequest().getRequestURI();
+          if (path.contains("550e8400-e29b-41d4-a716-446655440000-bad")) {
+            return "BadRequest"
+          }               
+          if (path.contains("550e8400-e29b-41d4-a716-446655440000-not-found")) {
+            return "NotFound"
+          }   
+          if (path.contains("550e8400-e29b-41d4-a716-446655440000-rate-limited")) {
+            return "RateLimited"
+          }                      
+          return "Success"
       security:
         - bearerHttpAuthentication: []
   /blocks/{block_id}/children:
@@ -348,6 +463,15 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/UUID'
+          examples:
+            Success:
+              value: '550e8400-e29b-41d4-a716-446655440000'
+            BadRequest:
+              value: '550e8400-e29b-41d4-a716-446655440000-bad-request'              
+            NotFound:
+              value: '550e8400-e29b-41d4-a716-446655440000-not-found'  
+            RateLimited:
+              value: '550e8400-e29b-41d4-a716-446655440000-rate-limited'              
         - $ref: '#/components/parameters/PageSize'
         - $ref: '#/components/parameters/StartCursor'
         - $ref: '#/components/parameters/Authorization'
@@ -359,7 +483,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BlocksList'
               examples:
-                blockChildren:
+                Success:
                   value:
                     object: list
                     results:
@@ -374,8 +498,6 @@ paths:
                     has_more: false
                     next_cursor: null
                     type: block
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -393,7 +515,23 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def path = mockRequest.getRequest().getRequestURI();
+          if (path.contains("550e8400-e29b-41d4-a716-446655440000-bad")) {
+            return "BadRequest"
+          }               
+          if (path.contains("550e8400-e29b-41d4-a716-446655440000-not-found")) {
+            return "NotFound"
+          }   
+          if (path.contains("550e8400-e29b-41d4-a716-446655440000-rate-limited")) {
+            return "RateLimited"
+          }                      
+          return "Success"
       security:
         - bearerHttpAuthentication: []
     patch:
@@ -408,6 +546,15 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/UUID'
+          examples:
+            Success:
+              value: '550e8400-e29b-41d4-a716-446655440000'
+            BadRequest:
+              value: '550e8400-e29b-41d4-a716-446655440000-bad-request'              
+            NotFound:
+              value: '550e8400-e29b-41d4-a716-446655440000-not-found'  
+            RateLimited:
+              value: '550e8400-e29b-41d4-a716-446655440000-rate-limited'              
         - $ref: '#/components/parameters/Authorization'
       requestBody:
         required: true
@@ -441,7 +588,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BlocksList'
               examples:
-                appendedBlocks:
+                Success:
                   value:
                     object: list
                     results:
@@ -452,8 +599,6 @@ paths:
                             - type: text
                               text:
                                 content: New paragraph 1
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -471,13 +616,32 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def path = mockRequest.getRequest().getRequestURI();
+          if (path.contains("550e8400-e29b-41d4-a716-446655440000-bad")) {
+            return "BadRequest"
+          }               
+          if (path.contains("550e8400-e29b-41d4-a716-446655440000-not-found")) {
+            return "NotFound"
+          }   
+          if (path.contains("550e8400-e29b-41d4-a716-446655440000-rate-limited")) {
+            return "RateLimited"
+          }                      
+          return "Success"
       security:
         - bearerHttpAuthentication: []
+
+  # COMMENTS
+
   /comments:
     post:
-      summary: Create Comments
-      operationId: createComments
+      summary: Create Comment
+      operationId: createComment
       tags:
         - Comments
       parameters:
@@ -490,13 +654,33 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateCommentRequest'
             examples:
-              createComment:
+              Success:
                 value:
                   parent:
-                    page_id: 59833787-2cf9-4fdf-8782-e53db20768a5
+                    page_id: 5c6a28216bb14a7eb6e1c50111515c3d
                   rich_text:
-                    - type: text
-                      text:
+                    - text:
+                        content: This is a comment on the page
+              BadRequest:
+                value:
+                  parent:
+                    page_id: 5c6a28216bb14a7eb6e1c50111515c3d-bad-request
+                  rich_text:
+                    - text:
+                        content: This is a comment on the page
+              NotFound:
+                value:
+                  parent:
+                    page_id: 5c6a28216bb14a7eb6e1c50111515c3d-not-found
+                  rich_text:
+                    - text:
+                        content: This is a comment on the page
+              RateLimited:
+                value:
+                  parent:
+                    page_id: 5c6a28216bb14a7eb6e1c50111515c3d-rate-limited
+                  rich_text:
+                    - text:
                         content: This is a comment on the page
       responses:
         '200':
@@ -506,7 +690,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Comment'
               examples:
-                createdComment:
+                Success:
                   value:
                     object: comment
                     id: 3c612f3a-f070-4f84-93aa-4f2f4e111111
@@ -521,8 +705,6 @@ paths:
                         text:
                           content: This is a comment on the page
                         plain_text: This is a comment on the page
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -540,7 +722,23 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def body = new groovy.json.JsonSlurper().parseText(mockRequest.getRequestContent())          
+          if (body.parent.page_id == "5c6a28216bb14a7eb6e1c50111515c3d-bad-request") {
+            return "BadRequest"
+          }     
+          if (body.parent.page_id == "5c6a28216bb14a7eb6e1c50111515c3d-not-found") {
+            return "NotFound"
+          }   
+          if (body.parent.page_id == "5c6a28216bb14a7eb6e1c50111515c3d-rate-limited") {
+            return "RateLimited"
+          }                                               
+          return "Success"
       security:
         - bearerHttpAuthentication: []
     get:
@@ -555,6 +753,13 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/UUID'
+          examples:
+            Success:
+              value: 'c02fc1d3-db8b-45c5-a222-27595b15aea7'
+            BadRequest:
+              value: 'c02fc1d3-db8b-45c5-a222-27595b15aea7-bad-request'              
+            RateLimited:
+              value: 'c02fc1d3-db8b-45c5-a222-27595b15aea7-rate-limited'                  
           description: Block or page ID to retrieve comments for
         - $ref: '#/components/parameters/PageSize'
         - $ref: '#/components/parameters/StartCursor'
@@ -567,7 +772,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CommentsList'
               examples:
-                comments:
+                Success:
                   value:
                     object: list
                     results:
@@ -580,8 +785,6 @@ paths:
                     has_more: false
                     next_cursor: null
                     type: comment
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -597,7 +800,20 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def paramValue = mockRequest.getRequest().getParameter('block_id');    
+          if (paramValue == "c02fc1d3-db8b-45c5-a222-27595b15aea7-bad-request") {
+            return "BadRequest"
+          }     
+          if (paramValue == "c02fc1d3-db8b-45c5-a222-27595b15aea7-rate-limited") {
+            return "RateLimited"
+          }                                               
+          return "Success"
       security:
         - bearerHttpAuthentication: []
   /comments/{comment_id}:
@@ -608,8 +824,21 @@ paths:
       operationId: retrieveComment
       description: Retrieves a comment object using its ID
       parameters:
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/CommentId'
+        - $ref: '#/components/parameters/NotionVersion'  
+        - name: comment_id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/CommentId'
+          examples:
+            Success:
+              value: '249911a-125e-803e-a164-001cf338b8ec'
+            BadRequest:
+              value: '249911a-125e-803e-a164-001cf338b8ec-bad-request'    
+            NotFound:
+              value: '249911a-125e-803e-a164-001cf338b8ec-not-found'                            
+            RateLimited:
+              value: '249911a-125e-803e-a164-001cf338b8ec-rate-limited'            
         - $ref: '#/components/parameters/Authorization'
       responses:
         '200':
@@ -619,12 +848,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/Comment'
               examples:
-                comment:
+                Success:
                   $ref: '#/components/examples/CommentExample'
-          x-microcks-refs:
-            - success
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/NotFound'          
+        '429':
+          $ref: '#/components/responses/RateLimited'                  
       x-naftiko:
         GenerateOperationSummariesFromPath: true
         CaselCaseOperationIds: true
@@ -634,9 +867,28 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def path = mockRequest.getRequest().getRequestURI();
+          if (path.contains("249911a-125e-803e-a164-001cf338b8ec-bad-request")) { 
+            return "BadRequest"
+          }     
+          if (path.contains("249911a-125e-803e-a164-001cf338b8ec-not-found")) { 
+            return "NotFound"
+          }                
+          if (path.contains("249911a-125e-803e-a164-001cf338b8ec-rate-limited")) { 
+            return "RateLimited"
+          }                                               
+          return "Success"
       security:
         - bearerHttpAuthentication: []
+
+  # DATABASES
+
   /databases:
     post:
       summary: Create Databases
@@ -653,7 +905,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateDatabaseRequest'
             examples:
-              createDatabase:
+              Success:
                 value:
                   parent:
                     page_id: 98ad959b-2b6a-4774-80ee-00246fb0ea9b
@@ -676,6 +928,75 @@ paths:
                             color: yellow
                           - name: Done
                             color: green
+              Forbidden:
+                value:
+                  parent:
+                    page_id: 98ad959b-2b6a-4774-80ee-00246fb0ea9b-forbidden
+                  title:
+                    - type: text
+                      text:
+                        content: My New Database
+                  icon:
+                    type: emoji
+                    emoji: "\U0001F4CA"
+                  properties:
+                    Name:
+                      title: {}
+                    Status:
+                      select:
+                        options:
+                          - name: Not started
+                            color: red
+                          - name: In progress
+                            color: yellow
+                          - name: Done
+                            color: green    
+              BadRequest:
+                value:
+                  parent:
+                    page_id: 98ad959b-2b6a-4774-80ee-00246fb0ea9b-bad-request
+                  title:
+                    - type: text
+                      text:
+                        content: My New Database
+                  icon:
+                    type: emoji
+                    emoji: "\U0001F4CA"
+                  properties:
+                    Name:
+                      title: {}
+                    Status:
+                      select:
+                        options:
+                          - name: Not started
+                            color: red
+                          - name: In progress
+                            color: yellow
+                          - name: Done
+                            color: green  
+              RateLimited:
+                value:
+                  parent:
+                    page_id: 98ad959b-2b6a-4774-80ee-00246fb0ea9b-rate-limited
+                  title:
+                    - type: text
+                      text:
+                        content: My New Database
+                  icon:
+                    type: emoji
+                    emoji: "\U0001F4CA"
+                  properties:
+                    Name:
+                      title: {}
+                    Status:
+                      select:
+                        options:
+                          - name: Not started
+                            color: red
+                          - name: In progress
+                            color: yellow
+                          - name: Done
+                            color: green                                                                                          
       responses:
         '200':
           description: Database created successfully
@@ -684,18 +1005,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/Database'
               examples:
-                createdDatabase:
+                Success:
                   $ref: '#/components/examples/SimpleDatabase'
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
         '429':
           $ref: '#/components/responses/RateLimited'
       x-naftiko:
@@ -707,7 +1024,23 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def body = new groovy.json.JsonSlurper().parseText(mockRequest.getRequestContent())          
+          if (body.parent.page_id == "98ad959b-2b6a-4774-80ee-00246fb0ea9b-bad-request") {
+            return "BadRequest"
+          }     
+          if (body.parent.page_id == "98ad959b-2b6a-4774-80ee-00246fb0ea9b-forbidden") {
+            return "Forbidden"
+          }   
+          if (body.parent.page_id == "98ad959b-2b6a-4774-80ee-00246fb0ea9b-rate-limited") {
+            return "RateLimited"
+          }                                               
+          return "Success"
       security:
         - bearerHttpAuthentication: []
   /databases/{database_id}:
@@ -723,6 +1056,15 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/UUID'
+          examples:
+            Success:
+              value: '248104cd-477e-80fd-b757-e945d38000bd'
+            BadRequest:
+              value: '248104cd-477e-80fd-b757-e945d38000bd-bad-request'    
+            NotFound:
+              value: '248104cd-477e-80fd-b757-e945d38000bd-not-found'                            
+            RateLimited:
+              value: '248104cd-477e-80fd-b757-e945d38000bd-rate-limited'              
         - $ref: '#/components/parameters/Authorization'
       responses:
         '200':
@@ -732,10 +1074,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Database'
               examples:
-                database:
+                Success:
                   $ref: '#/components/examples/SimpleDatabase'
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -753,7 +1093,23 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def path = mockRequest.getRequest().getRequestURI();
+          if (path.contains("248104cd-477e-80fd-b757-e945d38000bd-bad-request")) { 
+            return "BadRequest"
+          }     
+          if (path.contains("248104cd-477e-80fd-b757-e945d38000bd-not-found")) { 
+            return "NotFound"
+          }                
+          if (path.contains("248104cd-477e-80fd-b757-e945d38000bd-rate-limited")) { 
+            return "RateLimited"
+          }                                               
+          return "Success"
       security:
         - bearerHttpAuthentication: []
     patch:
@@ -768,6 +1124,15 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/UUID'
+          examples:
+            Success:
+              value: '248104cd-477e-80fd-b757-e945d38000bd'
+            BadRequest:
+              value: '248104cd-477e-80fd-b757-e945d38000bd-bad-request'    
+            NotFound:
+              value: '248104cd-477e-80fd-b757-e945d38000bd-not-found'                            
+            RateLimited:
+              value: '248104cd-477e-80fd-b757-e945d38000bd-rate-limited'            
         - $ref: '#/components/parameters/Authorization'
       requestBody:
         required: true
@@ -776,24 +1141,12 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateDatabaseRequest'
             examples:
-              updateTitle:
+              Success:
                 value:
                   title:
                     - type: text
                       text:
                         content: Updated Database Title
-              updateProperties:
-                value:
-                  properties:
-                    Priority:
-                      select:
-                        options:
-                          - name: High
-                            color: red
-                          - name: Medium
-                            color: yellow
-                          - name: Low
-                            color: green
       responses:
         '200':
           description: Database updated successfully
@@ -802,10 +1155,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Database'
               examples:
-                updatedDatabase:
+                Success:
                   $ref: '#/components/examples/SimpleDatabase'
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -823,9 +1174,28 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def path = mockRequest.getRequest().getRequestURI();
+          if (path.contains("248104cd-477e-80fd-b757-e945d38000bd-bad-request")) { 
+            return "BadRequest"
+          }     
+          if (path.contains("248104cd-477e-80fd-b757-e945d38000bd-not-found")) { 
+            return "NotFound"
+          }                
+          if (path.contains("248104cd-477e-80fd-b757-e945d38000bd-rate-limited")) { 
+            return "RateLimited"
+          }                                               
+          return "Success"
       security:
         - bearerHttpAuthentication: []
+
+  # Data Sources
+
   /data_sources:
     post:
       tags:
@@ -843,8 +1213,24 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateDataSourceRequest'
             examples:
-              create:
-                $ref: '#/components/examples/CreateDataSourceRequestExample'
+              Success:
+                value:
+                  name: New Data Source
+                  properties:
+                    field1:
+                      type: text
+              BadRequest:
+                value:
+                  name: New Data Source
+                  properties:
+                    field1:
+                      type: Bad Request 
+              RateLimited:
+                value:
+                  name: New Data Source
+                  properties:
+                    field1:
+                      type: Rate Limited                                    
       responses:
         '200':
           description: Data source created successfully
@@ -853,12 +1239,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/DataSource'
               examples:
-                created:
+                Success:
                   $ref: '#/components/examples/DataSourceExample'
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'          
       x-naftiko:
         GenerateOperationSummariesFromPath: true
         CaselCaseOperationIds: true
@@ -868,7 +1256,20 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def body = new groovy.json.JsonSlurper().parseText(mockRequest.getRequestContent())          
+          if (body.properties.field1.type == "Bad Request") {
+            return "BadRequest"
+          }     
+          if (body.properties.field1.type == "Rate Limited") {
+            return "RateLimited"
+          }                                                  
+          return "Success"
       security:
         - bearerHttpAuthentication: []
   /data_sources/{data_source_id}:
@@ -880,8 +1281,20 @@ paths:
       description: Retrieves a data source object using its ID
       parameters:
         - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/DataSourceId'
         - $ref: '#/components/parameters/Authorization'
+        - name: data_source_id
+          in: path
+          required: true
+          description: The data source ID   
+          schema:
+            $ref: '#/components/schemas/UUID'     
+          examples:
+            Success:
+              value: 'b55c9c91-384d-452b-81db-d1ef79372b75'
+            NotFound:
+              value: 'b55c9c91-384d-452b-81db-d1ef79372b75-not-found'                            
+            RateLimited:
+              value: 'b55c9c91-384d-452b-81db-d1ef79372b75-rate-limited'                 
       responses:
         '200':
           description: Data source retrieved successfully
@@ -890,12 +1303,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/DataSource'
               examples:
-                datasource:
+                Success:
                   $ref: '#/components/examples/DataSourceExample'
-          x-microcks-refs:
-            - success
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
       x-naftiko:
         GenerateOperationSummariesFromPath: true
         CaselCaseOperationIds: true
@@ -905,7 +1320,20 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def path = mockRequest.getRequest().getRequestURI();  
+          if (path.contains("b55c9c91-384d-452b-81db-d1ef79372b75-not-found")) { 
+            return "NotFound"
+          }                
+          if (path.contains("b55c9c91-384d-452b-81db-d1ef79372b75-rate-limited")) { 
+            return "RateLimited"
+          }                                               
+          return "Success"
       security:
         - bearerHttpAuthentication: []
     patch:
@@ -916,8 +1344,20 @@ paths:
       description: Updates an existing data source
       parameters:
         - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/DataSourceId'
         - $ref: '#/components/parameters/Authorization'
+        - name: data_source_id
+          in: path
+          required: true
+          description: The data source ID   
+          schema:
+            $ref: '#/components/schemas/UUID'     
+          examples:
+            Success:
+              value: 'b55c9c91-384d-452b-81db-d1ef79372b75'
+            NotFound:
+              value: 'b55c9c91-384d-452b-81db-d1ef79372b75-not-found'                            
+            RateLimited:
+              value: 'b55c9c91-384d-452b-81db-d1ef79372b75-rate-limited' 
       requestBody:
         required: true
         content:
@@ -925,7 +1365,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateDataSourceRequest'
             examples:
-              update:
+              Success:
                 $ref: '#/components/examples/UpdateDataSourceRequestExample'
       responses:
         '200':
@@ -935,14 +1375,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/DataSource'
               examples:
-                updated:
+                Success:
                   $ref: '#/components/examples/DataSourceExample'
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'          
       x-naftiko:
         GenerateOperationSummariesFromPath: true
         CaselCaseOperationIds: true
@@ -952,20 +1392,45 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def path = mockRequest.getRequest().getRequestURI();  
+          if (path.contains("b55c9c91-384d-452b-81db-d1ef79372b75-not-found")) { 
+            return "NotFound"
+          }                
+          if (path.contains("b55c9c91-384d-452b-81db-d1ef79372b75-rate-limited")) { 
+            return "RateLimited"
+          }                                               
+          return "Success"
       security:
         - bearerHttpAuthentication: []
   /data_sources/{data_source_id}/query:
     post:
       tags:
         - Data Sources
-      summary: Create Datasources Quer
+      summary: Create Datasources Query
       operationId: createDatasourcesQuer
       description: Queries a data source with filter and sort options
       parameters:
         - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/DataSourceId'
         - $ref: '#/components/parameters/Authorization'
+        - name: data_source_id
+          in: path
+          required: true
+          description: The data source ID   
+          schema:
+            $ref: '#/components/schemas/UUID'     
+          examples:
+            Success:
+              value: 'b55c9c91-384d-452b-81db-d1ef79372b75'
+            NotFound:
+              value: 'b55c9c91-384d-452b-81db-d1ef79372b75-not-found'                            
+            RateLimited:
+              value: 'b55c9c91-384d-452b-81db-d1ef79372b75-rate-limited' 
       requestBody:
         required: true
         content:
@@ -973,7 +1438,7 @@ paths:
             schema:
               $ref: '#/components/schemas/QueryDataSourceRequest'
             examples:
-              query:
+              Success:
                 $ref: '#/components/examples/QueryDataSourceRequestExample'
       responses:
         '200':
@@ -983,14 +1448,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/QueryDataSourceResponse'
               examples:
-                results:
+                Success:
                   $ref: '#/components/examples/QueryDataSourceResponseExample'
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'          
       x-naftiko:
         GenerateOperationSummariesFromPath: true
         CaselCaseOperationIds: true
@@ -1000,7 +1465,20 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def path = mockRequest.getRequest().getRequestURI();  
+          if (path.contains("b55c9c91-384d-452b-81db-d1ef79372b75-not-found")) { 
+            return "NotFound"
+          }                
+          if (path.contains("b55c9c91-384d-452b-81db-d1ef79372b75-rate-limited")) { 
+            return "RateLimited"
+          }                                               
+          return "Success"
       security:
         - bearerHttpAuthentication: []
   /data_sources/{data_source_id}/templates:
@@ -1011,11 +1489,27 @@ paths:
       tags:
         - Data sources
       parameters:
-        - $ref: '#/components/parameters/DataSourceIdPath'
-        - $ref: '#/components/parameters/StartCursor'
-        - $ref: '#/components/parameters/PageSize'
         - $ref: '#/components/parameters/NotionVersion'
         - $ref: '#/components/parameters/Authorization'
+        - name: data_source_id
+          in: path
+          required: true
+          description: The data source ID   
+          schema:
+            $ref: '#/components/schemas/UUID'     
+          examples:
+            Success:
+              value: 'b55c9c91-384d-452b-81db-d1ef79372b75'
+            BadRequest:
+              value: 'b55c9c91-384d-452b-81db-d1ef79372b75-bad-request'                 
+            Forbidden:
+              value: 'b55c9c91-384d-452b-81db-d1ef79372b75-forbidden'                
+            NotFound:
+              value: 'b55c9c91-384d-452b-81db-d1ef79372b75-not-found'                            
+            RateLimited:
+              value: 'b55c9c91-384d-452b-81db-d1ef79372b75-rate-limited' 
+        - $ref: '#/components/parameters/StartCursor'
+        - $ref: '#/components/parameters/PageSize'
       responses:
         '200':
           description: Successfully retrieved data source templates
@@ -1024,10 +1518,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/TemplateListResponse'
               examples:
-                successfulResponse:
+                Success:
                   $ref: '#/components/examples/TemplateListSuccessExample'
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1049,9 +1541,31 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def path = mockRequest.getRequest().getRequestURI();  
+          if (path.contains("b55c9c91-384d-452b-81db-d1ef79372b75-bad-request")) { 
+            return "BadRequest"
+          }   
+          if (path.contains("b55c9c91-384d-452b-81db-d1ef79372b75-forbidden")) { 
+            return "Forbidden"
+          }                       
+          if (path.contains("b55c9c91-384d-452b-81db-d1ef79372b75-not-found")) { 
+            return "NotFound"
+          }                
+          if (path.contains("b55c9c91-384d-452b-81db-d1ef79372b75-rate-limited")) { 
+            return "RateLimited"
+          }                                               
+          return "Success"
       security:
         - bearerHttpAuthentication: []
+
+  #FILE UPLOADS
+
   /file_uploads:
     post:
       tags:
@@ -1073,10 +1587,23 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateFileUploadRequest'
             examples:
-              singlePartImage:
-                $ref: '#/components/examples/CreateSinglePartImageUpload'
-              multiPartVideo:
-                $ref: '#/components/examples/CreateMultiPartVideoUpload'
+              Success:
+                filename: company-logo.png
+                file_size_bytes: 1048576
+                mime_type: image/png
+              BadRequest:
+                filename: company-logo-bad-request.png
+                file_size_bytes: 1048576
+                mime_type: image/png
+              Forbidden:
+                filename: company-logo-forbidden.png
+                file_size_bytes: 1048576
+                mime_type: image/png
+              RateLimitExceeded:
+                filename: company-logo-rate-limit-exceeded.png
+                file_size_bytes: 1048576
+                mime_type: image/png                                                
+
       responses:
         '200':
           description: File upload session created successfully
@@ -1085,12 +1612,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/FileUploadResponse'
               examples:
-                singlePartSuccess:
+                Success:
                   $ref: '#/components/examples/SinglePartUploadResponse'
-                multiPartSuccess:
-                  $ref: '#/components/examples/MultiPartUploadResponse'
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1108,7 +1631,23 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def body = new groovy.json.JsonSlurper().parseText(mockRequest.getRequestContent())          
+          if (body.filename == "company-logo-bad-request.png") {
+            return "BadRequest"
+          }     
+          if (body.filename == "company-logo-forbidden.png") {
+            return "Forbidden"
+          }     
+          if (body.filename == "company-logo-rate-limit-exceeded.png") {
+            return "RateLimitExceeded"
+          }                                                              
+          return "Success"
       security:
         - bearerHttpAuthentication: []
     get:
@@ -1119,9 +1658,21 @@ paths:
       operationId: retrieveFileUploads
       parameters:
         - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/PageSize'
-        - $ref: '#/components/parameters/StartCursor'
         - $ref: '#/components/parameters/Authorization'
+        - name: page_size
+          in: query
+          description: Number of items to return (max 100)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 100
+          examples:
+            Success:
+              value: 100
+            RateLimitExceeded:
+              value: 1000           
+        - $ref: '#/components/parameters/StartCursor'
       responses:
         '200':
           description: File uploads retrieved successfully
@@ -1130,10 +1681,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/FileUploadListResponse'
               examples:
-                fileList:
+                Success:
                   $ref: '#/components/examples/FileUploadListExample'
-          x-microcks-refs:
-            - success
         '401':
           $ref: '#/components/responses/Unauthorized'
         '429':
@@ -1147,7 +1696,17 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def paramValue = mockRequest.getRequest().getParameter('page_size');    
+          if (paramValue == 250) {
+            return "RateLimitExceeded"
+          }                                               
+          return "Success"
       security:
         - bearerHttpAuthentication: []
   /file_uploads/{file_upload_id}:
@@ -1159,14 +1718,21 @@ paths:
       operationId: retrieveFileUpload
       parameters:
         - $ref: '#/components/parameters/NotionVersion'
+        - $ref: '#/components/parameters/Authorization'
         - name: file_upload_id
           in: path
           required: true
+          description: The ID of the file upload to retrieve
           schema:
             type: string
-            format: uuid
-          description: The ID of the file upload to retrieve
-        - $ref: '#/components/parameters/Authorization'
+            format: uuid   
+          examples:
+            Success:
+              value: b52b8ed6-e029-4707-a671-832549c09de3    
+            NotFound:
+              value: b52b8ed6-e029-4707-a671-832549c09de3-not-found    
+            RateLimitExceeded:
+              value: b52b8ed6-e029-4707-a671-832549c09de3-rate-limit-exceeded                          
       responses:
         '200':
           description: File upload retrieved successfully
@@ -1175,14 +1741,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/FileUploadResponse'
               examples:
-                fileDetails:
+                Success:
                   $ref: '#/components/examples/SinglePartUploadResponse'
-          x-microcks-refs:
-            - success
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'          
       x-naftiko:
         GenerateOperationSummariesFromPath: true
         CaselCaseOperationIds: true
@@ -1192,7 +1758,20 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def path = mockRequest.getRequest().getRequestURI();                    
+          if (path.contains("b52b8ed6-e029-4707-a671-832549c09de3-not-found")) { 
+            return "NotFound"
+          }                
+          if (path.contains("b52b8ed6-e029-4707-a671-832549c09de3-rate-limit-exceeded")) { 
+            return "RateLimited"
+          }                                               
+          return "Success"
       security:
         - bearerHttpAuthentication: []
   /file_uploads/{file_upload_id}/send:
@@ -1203,9 +1782,26 @@ paths:
       tags:
         - File Uploads
       parameters:
-        - $ref: '#/components/parameters/FileUploadId'
         - $ref: '#/components/parameters/NotionVersion'
         - $ref: '#/components/parameters/Authorization'
+        - name: file_upload_id
+          in: path
+          required: true
+          description: The ID of the file upload to retrieve
+          schema:
+            type: string
+            format: uuid   
+          examples:
+            Success:
+              value: b52b8ed6-e029-4707-a671-832549c09de3
+            BadRequest:
+              value: b52b8ed6-e029-4707-a671-832549c09de3-bad-request
+            NotFound:
+              value: b52b8ed6-e029-4707-a671-832549c09de3-not-found
+            RateLimitExceeded:
+              value: b52b8ed6-e029-4707-a671-832549c09de3-rate-limit-exceeded
+            PayloadTooLarge:
+              value: b52b8ed6-e029-4707-a671-832549c09de3-payload-too-large
       requestBody:
         required: true
         content:
@@ -1223,10 +1819,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/FileUploadObject'
               examples:
-                uploaded:
+                Success:
                   $ref: '#/components/examples/FileUploadComplete'
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1234,7 +1828,9 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         '413':
-          $ref: '#/components/responses/PayloadTooLarge'
+          $ref: '#/components/responses/PayloadTooLarge'          
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'          
       x-naftiko:
         GenerateOperationSummariesFromPath: true
         CaselCaseOperationIds: true
@@ -1244,25 +1840,52 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def path = mockRequest.getRequest().getRequestURI();  
+          if (path.contains("b52b8ed6-e029-4707-a671-832549c09de3-bad-request")) { 
+            return "BadRequest"
+          }                   
+          if (path.contains("b52b8ed6-e029-4707-a671-832549c09de3-not-found")) { 
+            return "NotFound"
+          }   
+          if (path.contains("b52b8ed6-e029-4707-a671-832549c09de3-payload-too-large")) { 
+            return "PayloadTooLarge"
+          }                              
+          if (path.contains("b52b8ed6-e029-4707-a671-832549c09de3-rate-limit-exceeded")) { 
+            return "RateLimitExceeded"
+          }                    
+          return "Success"
       security:
         - bearerHttpAuthentication: []
   /file_uploads/{file_upload_id}/complete:
     post:
       tags:
         - File Uploads
-      summary: Create File Uploads Complet
+      summary: Create File Uploads Complete
       description: Finalizes a multi-part upload after all parts have been sent
       operationId: createFileUploadsComplet
       parameters:
         - $ref: '#/components/parameters/NotionVersion'
+        - $ref: '#/components/parameters/Authorization'
         - name: file_upload_id
           in: path
           required: true
+          description: The ID of the file upload to retrieve
           schema:
             type: string
-            format: uuid
-        - $ref: '#/components/parameters/Authorization'
+            format: uuid   
+          examples:
+            Success:
+              value: b52b8ed6-e029-4707-a671-832549c09de3    
+            BadRequest:
+              value: b52b8ed6-e029-4707-a671-832549c09de3-bad-request
+            RateLimitExceeded:
+              value: b52b8ed6-e029-4707-a671-832549c09de3-rate-limit-exceeded  
       requestBody:
         required: true
         content:
@@ -1280,12 +1903,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/FileUploadResponse'
               examples:
-                completed:
+                Success:
                   $ref: '#/components/examples/CompletedUploadResponse'
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'          
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'          
       x-naftiko:
         GenerateOperationSummariesFromPath: true
         CaselCaseOperationIds: true
@@ -1295,9 +1920,25 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def path = mockRequest.getRequest().getRequestURI();  
+          if (path.contains("b52b8ed6-e029-4707-a671-832549c09de3-bad-request")) { 
+            return "BadRequest"
+          }             
+          if (path.contains("b52b8ed6-e029-4707-a671-832549c09de3-rate-limit-exceeded")) { 
+            return "RateLimitExceeded"
+          }                                               
+          return "Success"
       security:
         - bearerHttpAuthentication: []
+
+  # PAGES
+
   /pages:
     post:
       summary: Create Pages
@@ -1314,26 +1955,226 @@ paths:
             schema:
               $ref: '#/components/schemas/CreatePageRequest'
             examples:
-              createPageInDatabase:
+              Success:
                 value:
                   parent:
-                    database_id: 668d797c-76fa-4934-9b05-ad288df2d136
+                    data_source_id: d9824bdc84454327be8b5b47500af6ce
+                  icon:
+                    emoji: 🥬
+                  cover:
+                    external:
+                      url: https://upload.wikimedia.org/wikipedia/commons/6/62/Tuscankale.jpg
                   properties:
                     Name:
                       title:
                         - text:
-                            content: New Page
-                  icon:
-                    type: emoji
-                    emoji: "\U0001F4C4"
+                            content: Tuscan Kale
+                    Description:
+                      rich_text:
+                        - text:
+                            content: A dark green leafy vegetable
+                    Food group:
+                      select:
+                        name: Vegetable
+                    Price:
+                      number: 2.5
                   children:
+                    - object: block
+                      type: heading_2
+                      heading_2:
+                        rich_text:
+                          - type: text
+                            text:
+                              content: Lacinato kale
                     - object: block
                       type: paragraph
                       paragraph:
                         rich_text:
                           - type: text
                             text:
-                              content: This is the first paragraph
+                              content: >-
+                                Lacinato kale is a variety of kale with a long tradition in
+                                Italian cuisine, especially that of Tuscany. It is also known as
+                                Tuscan kale, Italian kale, dinosaur kale, kale, flat back kale,
+                                palm tree kale, or black Tuscan palm.
+                              link:
+                                url: https://en.wikipedia.org/wiki/Lacinato_kale
+              BadRequest:
+                value:
+                  parent:
+                    data_source_id: d9824bdc84454327be8b5b47500af6ce-bad-request
+                  icon:
+                    emoji: 🥬
+                  cover:
+                    external:
+                      url: https://upload.wikimedia.org/wikipedia/commons/6/62/Tuscankale.jpg
+                  properties:
+                    Name:
+                      title:
+                        - text:
+                            content: Tuscan Kale
+                    Description:
+                      rich_text:
+                        - text:
+                            content: A dark green leafy vegetable
+                    Food group:
+                      select:
+                        name: Vegetable
+                    Price:
+                      number: 2.5
+                  children:
+                    - object: block
+                      type: heading_2
+                      heading_2:
+                        rich_text:
+                          - type: text
+                            text:
+                              content: Lacinato kale
+                    - object: block
+                      type: paragraph
+                      paragraph:
+                        rich_text:
+                          - type: text
+                            text:
+                              content: >-
+                                Lacinato kale is a variety of kale with a long tradition in
+                                Italian cuisine, especially that of Tuscany. It is also known as
+                                Tuscan kale, Italian kale, dinosaur kale, kale, flat back kale,
+                                palm tree kale, or black Tuscan palm.
+                              link:
+                                url: https://en.wikipedia.org/wiki/Lacinato_kale 
+              Forbidden:
+                value:
+                  parent:
+                    data_source_id: d9824bdc84454327be8b5b47500af6ce-forbidden
+                  icon:
+                    emoji: 🥬
+                  cover:
+                    external:
+                      url: https://upload.wikimedia.org/wikipedia/commons/6/62/Tuscankale.jpg
+                  properties:
+                    Name:
+                      title:
+                        - text:
+                            content: Tuscan Kale
+                    Description:
+                      rich_text:
+                        - text:
+                            content: A dark green leafy vegetable
+                    Food group:
+                      select:
+                        name: Vegetable
+                    Price:
+                      number: 2.5
+                  children:
+                    - object: block
+                      type: heading_2
+                      heading_2:
+                        rich_text:
+                          - type: text
+                            text:
+                              content: Lacinato kale
+                    - object: block
+                      type: paragraph
+                      paragraph:
+                        rich_text:
+                          - type: text
+                            text:
+                              content: >-
+                                Lacinato kale is a variety of kale with a long tradition in
+                                Italian cuisine, especially that of Tuscany. It is also known as
+                                Tuscan kale, Italian kale, dinosaur kale, kale, flat back kale,
+                                palm tree kale, or black Tuscan palm.
+                              link:
+                                url: https://en.wikipedia.org/wiki/Lacinato_kale
+              NotFound:
+                value:
+                  parent:
+                    data_source_id: d9824bdc84454327be8b5b47500af6ce-not-found
+                  icon:
+                    emoji: 🥬
+                  cover:
+                    external:
+                      url: https://upload.wikimedia.org/wikipedia/commons/6/62/Tuscankale.jpg
+                  properties:
+                    Name:
+                      title:
+                        - text:
+                            content: Tuscan Kale
+                    Description:
+                      rich_text:
+                        - text:
+                            content: A dark green leafy vegetable
+                    Food group:
+                      select:
+                        name: Vegetable
+                    Price:
+                      number: 2.5
+                  children:
+                    - object: block
+                      type: heading_2
+                      heading_2:
+                        rich_text:
+                          - type: text
+                            text:
+                              content: Lacinato kale
+                    - object: block
+                      type: paragraph
+                      paragraph:
+                        rich_text:
+                          - type: text
+                            text:
+                              content: >-
+                                Lacinato kale is a variety of kale with a long tradition in
+                                Italian cuisine, especially that of Tuscany. It is also known as
+                                Tuscan kale, Italian kale, dinosaur kale, kale, flat back kale,
+                                palm tree kale, or black Tuscan palm.
+                              link:
+                                url: https://en.wikipedia.org/wiki/Lacinato_kale 
+              RateLimited:
+                value:
+                  parent:
+                    data_source_id: d9824bdc84454327be8b5b47500af6ce-rate-limited
+                  icon:
+                    emoji: 🥬
+                  cover:
+                    external:
+                      url: https://upload.wikimedia.org/wikipedia/commons/6/62/Tuscankale.jpg
+                  properties:
+                    Name:
+                      title:
+                        - text:
+                            content: Tuscan Kale
+                    Description:
+                      rich_text:
+                        - text:
+                            content: A dark green leafy vegetable
+                    Food group:
+                      select:
+                        name: Vegetable
+                    Price:
+                      number: 2.5
+                  children:
+                    - object: block
+                      type: heading_2
+                      heading_2:
+                        rich_text:
+                          - type: text
+                            text:
+                              content: Lacinato kale
+                    - object: block
+                      type: paragraph
+                      paragraph:
+                        rich_text:
+                          - type: text
+                            text:
+                              content: >-
+                                Lacinato kale is a variety of kale with a long tradition in
+                                Italian cuisine, especially that of Tuscany. It is also known as
+                                Tuscan kale, Italian kale, dinosaur kale, kale, flat back kale,
+                                palm tree kale, or black Tuscan palm.
+                              link:
+                                url: https://en.wikipedia.org/wiki/Lacinato_kale                                                                                                             
       responses:
         '200':
           description: Page created successfully
@@ -1342,10 +2183,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Page'
               examples:
-                createdPage:
+                Success:
                   $ref: '#/components/examples/SimplePage'
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1365,7 +2204,26 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def body = new groovy.json.JsonSlurper().parseText(mockRequest.getRequestContent())          
+          if (body.parent.data_source_id == "d9824bdc84454327be8b5b47500af6ce-bad-request") {
+            return "BadRequest"
+          }     
+          if (body.parent.data_source_id == "d9824bdc84454327be8b5b47500af6ce-forbidden") {
+            return "Forbidden"
+          }  
+          if (body.parent.data_source_id == "d9824bdc84454327be8b5b47500af6ce-not-found") {
+            return "NotFound"
+          }  
+          if (body.parent.data_source_id == "d9824bdc84454327be8b5b47500af6ce-rate-limited") {
+            return "RateLimited"
+          }                                                                                  
+          return "Success"
       security:
         - bearerHttpAuthentication: []
   /pages/{page_id}/properties/{property_id}:
@@ -1378,6 +2236,20 @@ paths:
       parameters:
         - $ref: '#/components/parameters/NotionVersion'
         - $ref: '#/components/parameters/PageId'
+        - name: page_id
+          in: path
+          required: true
+          description: The ID of the page to retrieve
+          schema:
+            type: string
+            format: uuid   
+          examples:
+            Success:
+              value: 59833787-2cf9-4fdf-8782-e53db20768a5  
+            NotFound:
+              value: 59833787-2cf9-4fdf-8782-e53db20768a5-not-found
+            RateLimited:
+              value: 59833787-2cf9-4fdf-8782-e53db20768a5-rate-limited          
         - $ref: '#/components/parameters/PropertyId'
         - $ref: '#/components/parameters/Authorization'
       responses:
@@ -1388,12 +2260,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/PropertyItem'
               examples:
-                property:
+                Success:
                   $ref: '#/components/examples/PropertyItemExample'
-          x-microcks-refs:
-            - success
         '404':
           $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'          
       x-naftiko:
         GenerateOperationSummariesFromPath: true
         CaselCaseOperationIds: true
@@ -1403,7 +2275,20 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def path = mockRequest.getRequest().getRequestURI();  
+          if (path.contains("59833787-2cf9-4fdf-8782-e53db20768a5-not-found")) { 
+            return "NotFound"
+          }             
+          if (path.contains("59833787-2cf9-4fdf-8782-e53db20768a5-rate-limit-exceeded")) { 
+            return "RateLimitExceeded"
+          }                                               
+          return "Success"
       security:
         - bearerHttpAuthentication: []
   /pages/{page_id}/move:
@@ -1415,8 +2300,21 @@ paths:
       description: Moves a page to a new parent
       parameters:
         - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/PageId'
         - $ref: '#/components/parameters/Authorization'
+        - name: page_id
+          in: path
+          required: true
+          description: The ID of the page to retrieve
+          schema:
+            type: string
+            format: uuid   
+          examples:
+            Success:
+              value: 59833787-2cf9-4fdf-8782-e53db20768a5  
+            NotFound:
+              value: 59833787-2cf9-4fdf-8782-e53db20768a5-not-found
+            RateLimited:
+              value: 59833787-2cf9-4fdf-8782-e53db20768a5-rate-limited            
       requestBody:
         required: true
         content:
@@ -1434,14 +2332,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/Page'
               examples:
-                moved:
+                Success:
                   $ref: '#/components/examples/PageExample'
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'          
       x-naftiko:
         GenerateOperationSummariesFromPath: true
         CaselCaseOperationIds: true
@@ -1451,7 +2349,20 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def path = mockRequest.getRequest().getRequestURI();  
+          if (path.contains("59833787-2cf9-4fdf-8782-e53db20768a5-not-found")) { 
+            return "NotFound"
+          }             
+          if (path.contains("59833787-2cf9-4fdf-8782-e53db20768a5-rate-limit-exceeded")) { 
+            return "RateLimitExceeded"
+          }                                               
+          return "Success"
       security:
         - bearerHttpAuthentication: []
   /pages/{page_id}:
@@ -1465,9 +2376,17 @@ paths:
         - name: page_id
           in: path
           required: true
+          description: The ID of the page to retrieve
           schema:
-            $ref: '#/components/schemas/UUID'
-          description: Page identifier
+            type: string
+            format: uuid   
+          examples:
+            Success:
+              value: 59833787-2cf9-4fdf-8782-e53db20768a5  
+            NotFound:
+              value: 59833787-2cf9-4fdf-8782-e53db20768a5-not-found
+            RateLimited:
+              value: 59833787-2cf9-4fdf-8782-e53db20768a5-rate-limited    
         - $ref: '#/components/parameters/Authorization'
       responses:
         '200':
@@ -1477,10 +2396,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Page'
               examples:
-                page:
+                Success:
                   $ref: '#/components/examples/SimplePage'
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1498,7 +2415,23 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def path = mockRequest.getRequest().getRequestURI();  
+          if (path.contains("59833787-2cf9-4fdf-8782-e53db20768a5-bad-request")) { 
+            return "BadRequest"
+          }           
+          if (path.contains("59833787-2cf9-4fdf-8782-e53db20768a5-not-found")) { 
+            return "NotFound"
+          }               
+          if (path.contains("59833787-2cf9-4fdf-8782-e53db20768a5-rate-limited")) { 
+            return "RateLimited"
+          }                                               
+          return "Success"
       security:
         - bearerHttpAuthentication: []
     patch:
@@ -1508,12 +2441,25 @@ paths:
         - Pages
       parameters:
         - $ref: '#/components/parameters/NotionVersionHeader'
+        - $ref: '#/components/parameters/Authorization'
         - name: page_id
           in: path
           required: true
+          description: The ID of the page to retrieve
           schema:
-            $ref: '#/components/schemas/UUID'
-        - $ref: '#/components/parameters/Authorization'
+            type: string
+            format: uuid   
+          examples:
+            Success:
+              value: 59833787-2cf9-4fdf-8782-e53db20768a5  
+            BadRequest:
+              value: 59833787-2cf9-4fdf-8782-e53db20768a5-bad-request
+            NotFound:
+              value: 59833787-2cf9-4fdf-8782-e53db20768a5-not-found  
+            Conflict:
+              value: 59833787-2cf9-4fdf-8782-e53db20768a5-conflict                       
+            RateLimited:
+              value: 59833787-2cf9-4fdf-8782-e53db20768a5-rate-limited        
       requestBody:
         required: true
         content:
@@ -1521,16 +2467,11 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdatePageRequest'
             examples:
-              updateProperties:
+              Success:
                 value:
                   properties:
-                    Name:
-                      title:
-                        - text:
-                            content: Updated Title
-              archivePage:
-                value:
-                  archived: true
+                    In stock:
+                      checkbox: true
       responses:
         '200':
           description: Page updated successfully
@@ -1539,10 +2480,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Page'
               examples:
-                updatedPage:
+                Success:
                   $ref: '#/components/examples/SimplePage'
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1562,9 +2501,31 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def path = mockRequest.getRequest().getRequestURI();  
+          if (path.contains("59833787-2cf9-4fdf-8782-e53db20768a5-bad-request")) { 
+            return "BadRequest"
+          }               
+          if (path.contains("59833787-2cf9-4fdf-8782-e53db20768a5-not-found")) { 
+            return "NotFound"
+          }             
+          if (path.contains("59833787-2cf9-4fdf-8782-e53db20768a5-conflict")) { 
+            return "Conflict"
+          }               
+          if (path.contains("59833787-2cf9-4fdf-8782-e53db20768a5-rate-limit-exceeded")) { 
+            return "RateLimitExceeded"
+          }                                               
+          return "Success"
       security:
         - bearerHttpAuthentication: []
+
+  # SEARCH
+
   /search:
     post:
       summary: Create Search
@@ -1580,22 +2541,31 @@ paths:
             schema:
               $ref: '#/components/schemas/SearchRequest'
             examples:
-              searchAll:
-                value: {}
-              searchByQuery:
-                value:
-                  query: meeting notes
-              searchPagesOnly:
-                value:
-                  filter:
-                    value: page
-                    property: object
-              searchWithSort:
-                value:
-                  query: project
-                  sort:
-                    direction: descending
-                    timestamp: last_edited_time
+              Success:
+                query: External tasks
+                filter:
+                  value: data_source
+                  property: object
+                sort:
+                  direction: ascending
+                  timestamp: last_edited_time
+              BadRequest:
+                query: Bad Request
+                filter:
+                  value: data_source
+                  property: object
+                sort:
+                  direction: ascending
+                  timestamp: last_edited_time
+              RateLimited:
+                query: Rate Limited
+                filter:
+                  value: data_source
+                  property: object
+                sort:
+                  direction: ascending
+                  timestamp: last_edited_time                  
+
       responses:
         '200':
           description: Search executed successfully
@@ -1604,7 +2574,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/SearchResponse'
               examples:
-                searchResults:
+                Success:
                   value:
                     object: list
                     results:
@@ -1623,8 +2593,6 @@ paths:
                     has_more: false
                     next_cursor: null
                     type: page_or_database
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1640,126 +2608,23 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def body = new groovy.json.JsonSlurper().parseText(mockRequest.getRequestContent())          
+          if (body.query == "Bad Request") {
+            return "BadRequest"
+          }     
+          if (body.query == "Rate Limited") {
+            return "RateLimited"
+          }                                                                                  
+          return "Success"
       security:
         - bearerHttpAuthentication: []
-  /unfurl:
-    post:
-      summary: Create Unfurl
-      description: "Creates a Link Preview from an array of unfurl attribute objects. Every array must contain \na `title` attribute and a `dev` attribute.\n"
-      operationId: createUnfurl
-      tags:
-        - Link Previews
-      parameters:
-        - $ref: '#/components/parameters/NotionVersion'
-        - $ref: '#/components/parameters/Authorization'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UnfurlAttributeArray'
-            examples:
-              fullLinkPreview:
-                $ref: '#/components/examples/FullLinkPreviewRequest'
-              minimumLinkPreview:
-                $ref: '#/components/examples/MinimumLinkPreviewRequest'
-              withEmbedImage:
-                $ref: '#/components/examples/EmbedImageRequest'
-      responses:
-        '200':
-          description: Link Preview created successfully
-          headers:
-            notion-version:
-              $ref: '#/components/headers/NotionVersion'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LinkPreviewResponse'
-              examples:
-                success:
-                  $ref: '#/components/examples/LinkPreviewSuccessResponse'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '429':
-          $ref: '#/components/responses/RateLimited'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-  /link-unfurl:
-    post:
-      tags:
-        - Link Previews
-      summary: Create Link-unfurl
-      description: >
-        Creates a Link Preview by submitting an array of unfurl attribute objects.
 
-        Every payload must include a `title` attribute and a `dev` attribute.
-
-      operationId: createLinkUnfurl
-      parameters:
-        - $ref: '#/components/parameters/NotionVersionHeader'
-        - $ref: '#/components/parameters/Authorization'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UnfurlAttributeArray'
-            examples:
-              fullLinkPreview:
-                $ref: '#/components/examples/FullLinkPreviewRequest'
-              minimalLinkPreview:
-                $ref: '#/components/examples/MinimalLinkPreviewRequest'
-              withEmbed:
-                $ref: '#/components/examples/LinkPreviewWithEmbedRequest'
-      responses:
-        '200':
-          description: Link Preview created successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LinkPreviewResponse'
-              examples:
-                success:
-                  $ref: '#/components/examples/LinkPreviewSuccessResponse'
-          x-microcks-refs:
-            - success
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '429':
-          $ref: '#/components/responses/RateLimited'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
   /users:
     get:
       summary: Retrieve Users
@@ -1768,9 +2633,23 @@ paths:
         - Users
       parameters:
         - $ref: '#/components/parameters/NotionVersionHeader'
-        - $ref: '#/components/parameters/PageSize'
-        - $ref: '#/components/parameters/StartCursor'
         - $ref: '#/components/parameters/Authorization'
+        - name: page_size
+          in: query
+          description: Number of items to return (max 100)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 100
+          examples:
+            Success:
+              value: 100
+            BadRequest:
+              value: 5000  
+            RateLimited:
+              value: 10000                              
+        - $ref: '#/components/parameters/StartCursor'        
       responses:
         '200':
           description: Successfully retrieved users
@@ -1779,7 +2658,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UsersList'
               examples:
-                usersList:
+                Success:
                   value:
                     object: list
                     results:
@@ -1801,8 +2680,6 @@ paths:
                     has_more: false
                     next_cursor: null
                     type: user
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1820,7 +2697,17 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def paramValue = mockRequest.getRequest().getParameter('page_size');    
+          if (paramValue == 250) {
+            return "RateLimitExceeded"
+          }                                               
+          return "Success"
       security:
         - bearerHttpAuthentication: []
   /users/{user_id}:
@@ -1833,10 +2720,18 @@ paths:
         - $ref: '#/components/parameters/NotionVersionHeader'
         - name: user_id
           in: path
-          required: true
+          description: Number of items to return (max 100)
           schema:
             $ref: '#/components/schemas/UUID'
-          description: User identifier
+          examples:
+            Success:
+              value: d40e767c-d7af-4b18-a86d-55c61f1e39a4
+            BadRequest:
+              value: d40e767c-d7af-4b18-a86d-55c61f1e39a4-bad-request
+            NotFound:
+              value: d40e767c-d7af-4b18-a86d-55c61f1e39a4-not-found
+            RateLimited:
+              value: d40e767c-d7af-4b18-a86d-55c61f1e39a4-rate-limited                                        
         - $ref: '#/components/parameters/Authorization'
       responses:
         '200':
@@ -1850,8 +2745,6 @@ paths:
                   $ref: '#/components/examples/PersonUser'
                 botUser:
                   $ref: '#/components/examples/BotUser'
-          x-microcks-refs:
-            - success
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1869,7 +2762,23 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                 
+          def path = mockRequest.getRequest().getRequestURI();  
+          if (path.contains("d40e767c-d7af-4b18-a86d-55c61f1e39a4-bad-request")) { 
+            return "BadRequest"
+          }    
+          if (path.contains("d40e767c-d7af-4b18-a86d-55c61f1e39a4-not-found")) { 
+            return "NotFound"
+          }    
+          if (path.contains("d40e767c-d7af-4b18-a86d-55c61f1e39a4-rate-limited")) { 
+            return "RateLimited"
+          }                                                                  
+          return "Success"
       security:
         - bearerHttpAuthentication: []
   /users/me:
@@ -1891,8 +2800,6 @@ paths:
               examples:
                 botUser:
                   $ref: '#/components/examples/BotUser'
-          x-microcks-refs:
-            - success
         '401':
           $ref: '#/components/responses/Unauthorized'
         '429':
@@ -1906,120 +2813,16 @@ paths:
         AddAuthorizationHeaderParameterToOperations: true
       x-microcks-operation:
         dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
+        dispatcherRules: |
+          def headers = mockRequest.getRequestHeaders()
+          def authHeader = headers.get("Authorization")
+          if (authHeader == null || authHeader.isEmpty() || !authHeader.get(0)?.startsWith("Bearer ")) {
+            return "Unauthorized"
+          }                                                            
+          return "Success"
       security:
         - bearerHttpAuthentication: []
-  /webhook/events:
-    post:
-      tags:
-        - Webhooks
-      summary: Create Webhook Events
-      description: "Endpoint that receives webhook events from Notion. Your integration must respond with \na 2xx status code to acknowledge receipt. Events may be retried up to 8 times over 24 hours.\n"
-      operationId: createWebhookEvents
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              oneOf:
-                - $ref: '#/components/schemas/PageCreatedEvent'
-                - $ref: '#/components/schemas/PagePropertiesUpdatedEvent'
-                - $ref: '#/components/schemas/PageContentUpdatedEvent'
-                - $ref: '#/components/schemas/PageMovedEvent'
-                - $ref: '#/components/schemas/PageDeletedEvent'
-                - $ref: '#/components/schemas/PageUndeletedEvent'
-                - $ref: '#/components/schemas/PageLockedEvent'
-                - $ref: '#/components/schemas/PageUnlockedEvent'
-                - $ref: '#/components/schemas/DatabaseCreatedEvent'
-                - $ref: '#/components/schemas/DatabaseMovedEvent'
-                - $ref: '#/components/schemas/DatabaseDeletedEvent'
-                - $ref: '#/components/schemas/DatabaseUndeletedEvent'
-                - $ref: '#/components/schemas/DataSourceContentUpdatedEvent'
-                - $ref: '#/components/schemas/DataSourceCreatedEvent'
-                - $ref: '#/components/schemas/DataSourceDeletedEvent'
-                - $ref: '#/components/schemas/DataSourceMovedEvent'
-                - $ref: '#/components/schemas/DataSourceSchemaUpdatedEvent'
-                - $ref: '#/components/schemas/DataSourceUndeletedEvent'
-                - $ref: '#/components/schemas/CommentCreatedEvent'
-                - $ref: '#/components/schemas/CommentUpdatedEvent'
-                - $ref: '#/components/schemas/CommentDeletedEvent'
-              discriminator:
-                propertyName: type
-                mapping:
-                  page.created: '#/components/schemas/PageCreatedEvent'
-                  page.properties_updated: '#/components/schemas/PagePropertiesUpdatedEvent'
-                  page.content_updated: '#/components/schemas/PageContentUpdatedEvent'
-                  page.moved: '#/components/schemas/PageMovedEvent'
-                  page.deleted: '#/components/schemas/PageDeletedEvent'
-                  page.undeleted: '#/components/schemas/PageUndeletedEvent'
-                  page.locked: '#/components/schemas/PageLockedEvent'
-                  page.unlocked: '#/components/schemas/PageUnlockedEvent'
-                  database.created: '#/components/schemas/DatabaseCreatedEvent'
-                  database.moved: '#/components/schemas/DatabaseMovedEvent'
-                  database.deleted: '#/components/schemas/DatabaseDeletedEvent'
-                  database.undeleted: '#/components/schemas/DatabaseUndeletedEvent'
-                  data_source.content_updated: '#/components/schemas/DataSourceContentUpdatedEvent'
-                  data_source.created: '#/components/schemas/DataSourceCreatedEvent'
-                  data_source.deleted: '#/components/schemas/DataSourceDeletedEvent'
-                  data_source.moved: '#/components/schemas/DataSourceMovedEvent'
-                  data_source.schema_updated: '#/components/schemas/DataSourceSchemaUpdatedEvent'
-                  data_source.undeleted: '#/components/schemas/DataSourceUndeletedEvent'
-                  comment.created: '#/components/schemas/CommentCreatedEvent'
-                  comment.updated: '#/components/schemas/CommentUpdatedEvent'
-                  comment.deleted: '#/components/schemas/CommentDeletedEvent'
-            examples:
-              pageCreated:
-                $ref: '#/components/examples/PageCreatedExample'
-              pagePropertiesUpdated:
-                $ref: '#/components/examples/PagePropertiesUpdatedExample'
-              pageContentUpdated:
-                $ref: '#/components/examples/PageContentUpdatedExample'
-              commentCreated:
-                $ref: '#/components/examples/CommentCreatedExample'
-      responses:
-        '200':
-          description: Event received successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AcknowledgementResponse'
-              examples:
-                success:
-                  $ref: '#/components/examples/AcknowledgementExample'
-          x-microcks-refs:
-            - success
-        '400':
-          description: Bad request - invalid event format
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                invalidFormat:
-                  $ref: '#/components/examples/BadRequestExample'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                serverError:
-                  $ref: '#/components/examples/ServerErrorExample'
-      x-naftiko:
-        GenerateOperationSummariesFromPath: true
-        CaselCaseOperationIds: true
-        AddedMicrocksOperations: true
-        AddedMicrocksRefs: true
-        AddBearerAuthtoOperations: true
-        AddAuthorizationHeaderParameterToOperations: true
-      x-microcks-operation:
-        dispatcher: SCRIPT
-        dispatcherRules: "|\r\n          def headers = mockRequest.getRequestHeaders()\r\n          if (headers != null && headers.get(\"Authorization\") != null) {\r\n            return \"success\"\r\n          }\r\n          else{\r\n            return \"unauthorized\"\r\n          }"
-      security:
-        - bearerHttpAuthentication: []
-      parameters:
-        - $ref: '#/components/parameters/Authorization'
+
 webhooks:
   blockUpdated:
     post:
@@ -6787,7 +7590,7 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
           examples:
-            invalidRequest:
+            BadRequest:
               value:
                 object: error
                 status: 400
@@ -6800,14 +7603,12 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
           examples:
-            unauthorized:
+            Unauthorized:
               value:
                 object: error
                 status: 401
                 code: unauthorized
                 message: API token is invalid
-      x-microcks-refs:
-        - unauthorized
     NotFound:
       description: Not found - resource does not exist
       content:
@@ -6815,7 +7616,7 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
           examples:
-            notFound:
+            NotFound:
               value:
                 object: error
                 status: 404
@@ -6828,7 +7629,7 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
           examples:
-            rateLimited:
+            RateLimited:
               value:
                 object: error
                 status: 429
@@ -6840,11 +7641,13 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
-          example:
-            object: error
-            status: 429
-            code: rate_limited
-            message: Too many requests. Please try again later.
+          examples:
+            RateLimitExceeded:
+              value:
+                object: error
+                status: 429
+                code: rate_limited
+                message: Too many requests. Please try again later.
     InternalServerError:
       description: Internal server error
       content:
@@ -6852,7 +7655,7 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
           examples:
-            serverError:
+            InternalServerError:
               value:
                 object: error
                 status: 500
@@ -6865,7 +7668,7 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
           examples:
-            restrictedResource:
+            Forbidden:
               value:
                 object: error
                 status: 403
@@ -6878,7 +7681,7 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
           examples:
-            conflict:
+            Conflict:
               value:
                 object: error
                 status: 409
@@ -6890,11 +7693,13 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
-          example:
-            object: error
-            status: 413
-            code: payload_too_large
-            message: Part size exceeds maximum of 20971520 bytes
+          examples:
+            PayloadTooLarge:
+              value:
+                object: error
+                status: 413
+                code: payload_too_large
+                message: Part size exceeds maximum of 20971520 bytes
   securitySchemes:
     bearerHttpAuthentication:
       description: Bearer Token

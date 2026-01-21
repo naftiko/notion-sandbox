@@ -11,14 +11,18 @@ post {
 }
 
 headers {
-  Notion-Version: 
-  Authorization: 
+  Notion-Version: {{notionVersion}}
+  Authorization: Bearer {{notionToken}}
 }
 
 body:json {
   {
-    "name": "",
-    "properties": {}
+    "name": "New Data Source",
+    "properties": {
+      "field1": {
+        "type": "text"
+      }
+    }
   }
 }
 

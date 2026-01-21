@@ -11,20 +11,19 @@ patch {
 }
 
 params:path {
-  page_id: 
+  page_id: 59833787-2cf9-4fdf-8782-e53db20768a5
 }
 
 headers {
-  Notion-Version: 
-  Authorization: 
+  Notion-Version: {{notionVersion}}
+  Authorization: Bearer {{notionToken}}
 }
 
 body:json {
   {
-    "properties": {},
-    "archived": false,
-    "icon": "",
-    "cover": ""
+    "properties": {
+      "In stock": { "checkbox": true }
+    }
   }
 }
 

@@ -5,20 +5,20 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/comments?block_id=11
+  url: {{baseUrl}}/comments?block_id=c02fc1d3-db8b-45c5-a222-27595b15aea7
   body: none
   auth: inherit
 }
 
 params:query {
-  block_id: 11
-  ~page_size: 
+  block_id: c02fc1d3-db8b-45c5-a222-27595b15aea7
+  ~page_size: 25
   ~start_cursor: 
 }
 
 headers {
-  Notion-Version: 
-  Authorization: 
+  Notion-Version: {{notionVersion}}
+  Authorization: Bearer {{notionToken}}
 }
 
 example {

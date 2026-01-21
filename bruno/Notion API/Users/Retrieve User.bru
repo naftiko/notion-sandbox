@@ -1,43 +1,33 @@
 meta {
-  name: Retrieve Blocks Childre
+  name: Retrieve User
   type: http
-  seq: 4
+  seq: 2
 }
 
 get {
-  url: {{baseUrl}}/blocks/:block_id/children
+  url: {{baseUrl}}/users/:user_id
   body: none
   auth: inherit
 }
 
-params:query {
-  ~page_size: 
-  ~start_cursor: 
-}
-
 params:path {
-  block_id: 
+  user_id: 111
 }
 
 headers {
-  Notion-Version: 
-  Authorization: 
+  Notion-Version: {{notionVersion}}
+  Authorization: Bearer {{notionToken}}
 }
 
 example {
-  name: blockChildren
+  name: personUser
   
   request: {
-    url: {{baseUrl}}/blocks/:block_id/children
+    url: {{baseUrl}}/users/:user_id
     method: GET
     mode: none
-    params:query: {
-      ~page_size: 
-      ~start_cursor: 
-    }
-  
     params:path: {
-      block_id: 
+      user_id: 
     }
   
     headers: {
@@ -60,27 +50,63 @@ example {
       type: json
       content: '''
         {
-          "object": "list",
-          "results": [
-            {
-              "object": "block",
-              "id": "c02fc1d3-db8b-45c5-a222-27595b15aea7",
-              "type": "paragraph",
-              "paragraph": {
-                "rich_text": [
-                  {
-                    "type": "text",
-                    "text": {
-                      "content": "First paragraph"
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "has_more": false,
-          "next_cursor": null,
-          "type": "block"
+          "object": "user",
+          "id": "71e95936-2737-4e11-b03d-f174f6f13e90",
+          "type": "person",
+          "name": "Jane Doe",
+          "avatar_url": "https://example.com/avatar.jpg",
+          "person": {
+            "email": "jane@example.com"
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: botUser
+  
+  request: {
+    url: {{baseUrl}}/users/:user_id
+    method: GET
+    mode: none
+    params:path: {
+      user_id: 
+    }
+  
+    headers: {
+      Notion-Version: 
+      Authorization: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "object": "user",
+          "id": "b8d9c9d5-b8a4-4f11-8f7c-8e5c6d4a3b2c",
+          "type": "bot",
+          "name": "My Integration",
+          "avatar_url": null,
+          "bot": {
+            "owner": {
+              "type": "workspace",
+              "workspace": true
+            },
+            "workspace_name": "My Workspace"
+          }
         }
       '''
     }
@@ -91,16 +117,11 @@ example {
   name: invalidRequest
   
   request: {
-    url: {{baseUrl}}/blocks/:block_id/children
+    url: {{baseUrl}}/users/:user_id
     method: GET
     mode: none
-    params:query: {
-      ~page_size: 
-      ~start_cursor: 
-    }
-  
     params:path: {
-      block_id: 
+      user_id: 
     }
   
     headers: {
@@ -137,16 +158,11 @@ example {
   name: unauthorized
   
   request: {
-    url: {{baseUrl}}/blocks/:block_id/children
+    url: {{baseUrl}}/users/:user_id
     method: GET
     mode: none
-    params:query: {
-      ~page_size: 
-      ~start_cursor: 
-    }
-  
     params:path: {
-      block_id: 
+      user_id: 
     }
   
     headers: {
@@ -183,16 +199,11 @@ example {
   name: notFound
   
   request: {
-    url: {{baseUrl}}/blocks/:block_id/children
+    url: {{baseUrl}}/users/:user_id
     method: GET
     mode: none
-    params:query: {
-      ~page_size: 
-      ~start_cursor: 
-    }
-  
     params:path: {
-      block_id: 
+      user_id: 
     }
   
     headers: {
@@ -229,16 +240,11 @@ example {
   name: rateLimited
   
   request: {
-    url: {{baseUrl}}/blocks/:block_id/children
+    url: {{baseUrl}}/users/:user_id
     method: GET
     mode: none
-    params:query: {
-      ~page_size: 
-      ~start_cursor: 
-    }
-  
     params:path: {
-      block_id: 
+      user_id: 
     }
   
     headers: {
