@@ -13,6 +13,19 @@ This sandbox uses Microcks to deliver the mock API. [You just install Microcks, 
 ## Bruno
 This sandbox [uses Bruno as the client](https://www.usebruno.com/), leveraging a [Bruno Collection](bruno/Notion+API/) pre-generated from the OpenAPI and a [Bruno environment](bruno/Notion+API/environments/) that uses the localhost and port of Microcks to work with the mocked API. You just have to install Microcks, then open the collection provided in this repository, select the available environment, and begin calling the Notion API via the sandbox.
 
+## Summary
+This is a summary of this sandbox, breaking down the available paths, operations, and other relevant detail regarding the scope of this sandbox, designed to support development and testing against the Notion API.
+
+- Number of Paths: 26
+- Number of Operations: 34
+- Number of Read Operations: 14
+- Number of Write Operations: 20
+- Number of Schemas: 127
+- Number of Responses: 9
+- Number of Parameters: 12
+- Number of Examples: 69
+- Number of Headers: 1
+
 ## Resources
 These are the resources available via the Notion API, which are made available via this sandbox API, which are applied as tags to each operation in the OpenAPI.
 
@@ -22,15 +35,15 @@ These are the resources available via the Notion API, which are made available v
   - Data Sources
   - Databases
   - File Uploads
-  - Notion
   - Pages
+  - Productivity
   - Search
   - Users
 
 ## Operations
 These are all of the available operations in this sandbox, providing a complete view of what you can do within this sandbox using the mocked Notion API.
 
-  - Create Comments
+  - Create Comment
   - Create Databases
   - Create Datasources
   - Create Datasources Query
@@ -60,7 +73,7 @@ These are all of the available operations in this sandbox, providing a complete 
   - Retrieve File Upload
   - Retrieve File Uploads
   - Retrieve Pages
-  - Retrieve Page Properties
+  - Retrieve Pages Properties
   - Retrieve User
   - Retrieve Users
   - Retrieve Users Me
