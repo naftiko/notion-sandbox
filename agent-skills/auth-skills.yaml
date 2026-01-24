@@ -1,0 +1,215 @@
+# Notion Authentication Skills
+# Agent skills for OAuth and token management
+
+skills:
+  - id: notion/auth/exchange-token
+    name: Exchange Authorization Code
+    description: >
+      Exchange an OAuth authorization code for an access token.
+      This is part of the OAuth 2.0 authorization code flow.
+    tags:
+      - notion
+      - auth
+      - oauth
+      - token
+    examples:
+      - "Exchange auth code for access token"
+      - "Complete OAuth flow"
+      - "Get access token from authorization code"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: POST
+      path: /oauth/token
+    parameters:
+      grant_type:
+        type: string
+        required: true
+        const: authorization_code
+        description: Must be "authorization_code"
+      code:
+        type: string
+        required: true
+        description: The authorization code received from the OAuth flow
+      redirect_uri:
+        type: string
+        format: uri
+        required: true
+        description: >
+          Must match the redirect URI used when obtaining the authorization code
+    authentication:
+      type: basic
+      description: >
+        Use Basic authentication with client_id:client_secret encoded in Base64
+    responses:
+      "200":
+        description: Token created successfully
+        schema:
+          $ref: "#/components/TokenResponse"
+      "400":
+        description: Bad request - invalid parameters
+      "401":
+        description: Unauthorized - invalid client credentials
+
+  - id: notion/auth/introspect-token
+    name: Introspect Token
+    description: >
+      Get information about the current access token.
+      Verify if a token is still active and get associated metadata.
+    tags:
+      - notion
+      - auth
+      - token
+      - introspect
+    examples:
+      - "Check my token status"
+      - "Is my token still valid?"
+      - "Get token information"
+      - "Verify token validity"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: POST
+      path: /oauth/token/introspect
+    parameters:
+      token:
+        type: string
+        required: true
+        description: The token to introspect
+    responses:
+      "200":
+        description: Token introspection successful
+        schema:
+          $ref: "#/components/IntrospectResponse"
+      "401":
+        description: Unauthorized
+
+  - id: notion/auth/refresh-token
+    name: Refresh Token
+    description: >
+      Get a new access token using a refresh token.
+      Use this when the current access token has expired.
+    tags:
+      - notion
+      - auth
+      - token
+      - refresh
+    examples:
+      - "Refresh my access token"
+      - "Get a new token"
+      - "Renew expired token"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: POST
+      path: /oauth/token/refresh
+    parameters:
+      grant_type:
+        type: string
+        required: true
+        const: refresh_token
+        description: Must be "refresh_token"
+      refresh_token:
+        type: string
+        required: true
+        description: The refresh token to use
+    responses:
+      "200":
+        description: Token refreshed successfully
+        schema:
+          $ref: "#/components/TokenResponse"
+      "400":
+        description: Bad request - invalid refresh token
+
+  - id: notion/auth/revoke-token
+    name: Revoke Token
+    description: >
+      Revoke an access token to end a session.
+      The token will no longer be valid for API requests.
+    tags:
+      - notion
+      - auth
+      - token
+      - revoke
+    examples:
+      - "Revoke my access token"
+      - "Log out of Notion"
+      - "End this session"
+      - "Invalidate the token"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: POST
+      path: /oauth/token/revoke
+    parameters:
+      token:
+        type: string
+        required: true
+        description: The token to revoke
+    responses:
+      "200":
+        description: Token revoked successfully
+        schema:
+          type: object
+          properties:
+            revoked:
+              type: boolean
+              description: Whether the token was successfully revoked
+      "401":
+        description: Unauthorized
+
+components:
+  TokenResponse:
+    type: object
+    properties:
+      access_token:
+        type: string
+        description: The access token for API requests
+      token_type:
+        type: string
+        const: bearer
+        description: Token type (always "bearer")
+      expires_in:
+        type: integer
+        description: Token expiration time in seconds
+      refresh_token:
+        type: string
+        description: Token to use for refreshing the access token
+      bot_id:
+        type: string
+        format: uuid
+        description: ID of the bot user associated with the token
+      workspace_id:
+        type: string
+        format: uuid
+        description: ID of the workspace the token grants access to
+      workspace_name:
+        type: string
+        description: Name of the workspace
+      workspace_icon:
+        type: string
+        format: uri
+        description: URL of the workspace icon
+
+  IntrospectResponse:
+    type: object
+    properties:
+      active:
+        type: boolean
+        description: Whether the token is currently active
+      bot_id:
+        type: string
+        format: uuid
+        description: ID of the bot user associated with the token
+      workspace_id:
+        type: string
+        format: uuid
+        description: ID of the workspace the token grants access to

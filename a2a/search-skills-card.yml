@@ -1,0 +1,33 @@
+id: notion-search
+name: Notion Search Skill
+description: Search across all accessible pages and databases in a Notion workspace
+tags:
+  - search
+  - discovery
+  - notion
+examples:
+  - Find all pages containing 'Q4 Report'
+  - Search for databases only
+  - Find recently edited content
+  - Search with sorting by last edited time
+inputModes:
+  - application/json
+outputModes:
+  - application/json
+operations:
+  - name: search
+    description: Search pages and databases by title
+    parameters:
+      query:
+        type: string
+        description: Search query text
+      filter:
+        type: object
+        description: Filter by object type (page or database)
+      sort:
+        type: object
+        description: Sort by last_edited_time, ascending or descending
+      page_size:
+        type: integer
+        minimum: 1
+        maximum: 100

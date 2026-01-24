@@ -1,0 +1,94 @@
+# Notion API Agent Card
+# A2A (Agent-to-Agent) Protocol Compliant
+
+name: Notion Agent
+description: >
+  An agent that provides access to Notion workspaces, enabling creation, 
+  retrieval, and management of pages, databases, blocks, comments, and files.
+url: https://api.notion.com/v1
+version: "1.1.0"
+
+provider:
+  organization: Notion
+  url: https://www.notion.so
+
+documentation:
+  url: https://developers.notion.com
+  apiReference: https://developers.notion.com/reference
+
+capabilities:
+  streaming: false
+  pushNotifications: true
+  stateTransitionHistory: false
+  pagination: true
+  webhooks: true
+
+authentication:
+  schemes:
+    - bearer
+  description: OAuth 2.0 access token or internal integration token
+  oauth:
+    authorizationUrl: https://api.notion.com/v1/oauth/authorize
+    tokenUrl: https://api.notion.com/v1/oauth/token
+    refreshUrl: https://api.notion.com/v1/oauth/token/refresh
+    scopes:
+      - read_content
+      - update_content
+      - insert_content
+      - read_user
+
+defaultInputModes:
+  - application/json
+
+defaultOutputModes:
+  - application/json
+
+rateLimits:
+  requests:
+    limit: 3
+    window: 1s
+    description: 3 requests per second average
+
+headers:
+  required:
+    - name: Notion-Version
+      value: "2022-06-28"
+      description: API version date
+    - name: Authorization
+      value: "Bearer {token}"
+      description: Authentication token
+
+skills:
+  - $ref: "./skills/pages-skills.yaml"
+  - $ref: "./skills/databases-skills.yaml"
+  - $ref: "./skills/blocks-skills.yaml"
+  - $ref: "./skills/comments-skills.yaml"
+  - $ref: "./skills/search-skills.yaml"
+  - $ref: "./skills/users-skills.yaml"
+  - $ref: "./skills/files-skills.yaml"
+  - $ref: "./skills/data-sources-skills.yaml"
+  - $ref: "./skills/auth-skills.yaml"
+
+webhookEvents:
+  - page.created
+  - page.properties_updated
+  - page.content_updated
+  - page.moved
+  - page.deleted
+  - page.undeleted
+  - page.locked
+  - page.unlocked
+  - database.created
+  - database.schema_updated
+  - database.moved
+  - database.deleted
+  - database.undeleted
+  - comment.created
+  - comment.updated
+  - comment.deleted
+  - data_source.created
+  - data_source.schema_updated
+  - data_source.content_updated
+  - data_source.moved
+  - data_source.deleted
+  - data_source.undeleted

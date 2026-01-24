@@ -1,0 +1,714 @@
+# Notion Blocks Skills
+# Agent skills for managing content blocks within Notion pages
+
+skills:
+  - id: notion/blocks/retrieve
+    name: Retrieve Block
+    description: >
+      Get a specific block by ID, including its content and metadata.
+    tags:
+      - notion
+      - blocks
+      - read
+      - content
+    examples:
+      - "Get the block with ID abc123"
+      - "Fetch this paragraph block"
+      - "What's the content of this heading block?"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: GET
+      path: /blocks/{block_id}
+    parameters:
+      block_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+        description: The unique identifier of the block
+    responses:
+      "200":
+        description: Block retrieved successfully
+        schema:
+          $ref: "#/components/Block"
+      "400":
+        description: Bad request
+      "401":
+        description: Unauthorized
+      "404":
+        description: Block not found
+      "429":
+        description: Rate limit exceeded
+
+  - id: notion/blocks/get-children
+    name: Get Block Children
+    description: >
+      Retrieve all child blocks of a block or page.
+      Use this to read the content of a page.
+    tags:
+      - notion
+      - blocks
+      - read
+      - content
+      - children
+    examples:
+      - "Get all content blocks from this page"
+      - "List the children of this toggle block"
+      - "Read the contents of my meeting notes"
+      - "What blocks are inside this callout?"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: GET
+      path: /blocks/{block_id}/children
+    parameters:
+      block_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+        description: Block or page ID to get children from
+      page_size:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 100
+        in: query
+        description: Number of results per page
+      start_cursor:
+        type: string
+        in: query
+        description: Pagination cursor from previous response
+    responses:
+      "200":
+        description: Children retrieved successfully
+        schema:
+          type: object
+          properties:
+            object:
+              type: string
+              const: list
+            results:
+              type: array
+              items:
+                $ref: "#/components/Block"
+            has_more:
+              type: boolean
+            next_cursor:
+              type: string
+              nullable: true
+            type:
+              type: string
+              const: block
+      "400":
+        description: Bad request
+      "401":
+        description: Unauthorized
+      "404":
+        description: Block not found
+      "429":
+        description: Rate limit exceeded
+
+  - id: notion/blocks/append-children
+    name: Append Block Children
+    description: >
+      Add new content blocks to a page or existing block.
+      Supports all block types including paragraphs, headings, lists,
+      code blocks, images, embeds, and more.
+    tags:
+      - notion
+      - blocks
+      - create
+      - content
+      - write
+    examples:
+      - "Add a paragraph to my page"
+      - "Insert a to-do list with three items"
+      - "Add a heading followed by bullet points"
+      - "Append a code block with Python syntax"
+      - "Add an image block with this URL"
+      - "Insert a callout with a warning message"
+      - "Add a table with 3 columns and 5 rows"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: PATCH
+      path: /blocks/{block_id}/children
+    parameters:
+      block_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+        description: Parent block or page ID to append children to
+      children:
+        type: array
+        required: true
+        description: Array of block objects to append (max 100)
+        maxItems: 100
+        items:
+          $ref: "#/components/BlockInput"
+      after:
+        type: string
+        format: uuid
+        description: >
+          Block ID to insert new blocks after.
+          If not provided, blocks are appended at the end.
+    responses:
+      "200":
+        description: Children appended successfully
+        schema:
+          type: object
+          properties:
+            object:
+              type: string
+              const: list
+            results:
+              type: array
+              items:
+                $ref: "#/components/Block"
+      "400":
+        description: Bad request - invalid block content
+      "401":
+        description: Unauthorized
+      "404":
+        description: Parent block not found
+      "429":
+        description: Rate limit exceeded
+
+  - id: notion/blocks/update
+    name: Update Block
+    description: >
+      Modify an existing block's content or archive it.
+      The type of content update depends on the block type.
+    tags:
+      - notion
+      - blocks
+      - update
+      - edit
+      - content
+    examples:
+      - "Update this paragraph text"
+      - "Check off this to-do item"
+      - "Change the heading to 'Final Summary'"
+      - "Update the code block language to JavaScript"
+      - "Archive this block"
+      - "Update the URL in this bookmark block"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: PATCH
+      path: /blocks/{block_id}
+    parameters:
+      block_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+        description: The unique identifier of the block to update
+      paragraph:
+        type: object
+        description: Paragraph block content update
+        properties:
+          rich_text:
+            type: array
+            items:
+              $ref: "#/components/RichText"
+          color:
+            type: string
+      heading_1:
+        type: object
+        description: Heading 1 block content update
+      heading_2:
+        type: object
+        description: Heading 2 block content update
+      heading_3:
+        type: object
+        description: Heading 3 block content update
+      bulleted_list_item:
+        type: object
+        description: Bulleted list item content update
+      numbered_list_item:
+        type: object
+        description: Numbered list item content update
+      to_do:
+        type: object
+        description: To-do block content update
+        properties:
+          rich_text:
+            type: array
+          checked:
+            type: boolean
+      toggle:
+        type: object
+        description: Toggle block content update
+      code:
+        type: object
+        description: Code block content update
+        properties:
+          rich_text:
+            type: array
+          language:
+            type: string
+      quote:
+        type: object
+        description: Quote block content update
+      callout:
+        type: object
+        description: Callout block content update
+      bookmark:
+        type: object
+        description: Bookmark block content update
+        properties:
+          url:
+            type: string
+            format: uri
+          caption:
+            type: array
+      archived:
+        type: boolean
+        description: Set to true to archive (soft delete) the block
+    responses:
+      "200":
+        description: Block updated successfully
+        schema:
+          $ref: "#/components/Block"
+      "400":
+        description: Bad request - invalid content for block type
+      "401":
+        description: Unauthorized
+      "404":
+        description: Block not found
+      "429":
+        description: Rate limit exceeded
+
+  - id: notion/blocks/delete
+    name: Delete Block
+    description: >
+      Delete (archive) a block from a page.
+      This is a soft delete - the block can be recovered.
+    tags:
+      - notion
+      - blocks
+      - delete
+      - remove
+    examples:
+      - "Delete this paragraph"
+      - "Remove the second item from the list"
+      - "Delete this image block"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: DELETE
+      path: /blocks/{block_id}
+    parameters:
+      block_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+        description: The unique identifier of the block to delete
+    responses:
+      "200":
+        description: Block deleted (archived) successfully
+        schema:
+          $ref: "#/components/Block"
+      "400":
+        description: Bad request
+      "401":
+        description: Unauthorized
+      "404":
+        description: Block not found
+      "429":
+        description: Rate limit exceeded
+
+components:
+  Block:
+    type: object
+    properties:
+      object:
+        type: string
+        const: block
+      id:
+        type: string
+        format: uuid
+      type:
+        type: string
+        enum:
+          - paragraph
+          - heading_1
+          - heading_2
+          - heading_3
+          - bulleted_list_item
+          - numbered_list_item
+          - to_do
+          - toggle
+          - code
+          - quote
+          - callout
+          - divider
+          - table_of_contents
+          - image
+          - video
+          - file
+          - pdf
+          - bookmark
+          - embed
+          - child_page
+          - child_database
+          - table
+          - table_row
+          - column_list
+          - column
+          - synced_block
+          - template
+          - link_preview
+          - link_to_page
+      created_time:
+        type: string
+        format: date-time
+      created_by:
+        type: object
+      last_edited_time:
+        type: string
+        format: date-time
+      last_edited_by:
+        type: object
+      archived:
+        type: boolean
+      has_children:
+        type: boolean
+      parent:
+        type: object
+
+  BlockInput:
+    type: object
+    required:
+      - object
+      - type
+    properties:
+      object:
+        type: string
+        const: block
+      type:
+        type: string
+        description: The block type
+      paragraph:
+        $ref: "#/components/ParagraphInput"
+      heading_1:
+        $ref: "#/components/HeadingInput"
+      heading_2:
+        $ref: "#/components/HeadingInput"
+      heading_3:
+        $ref: "#/components/HeadingInput"
+      bulleted_list_item:
+        $ref: "#/components/ListItemInput"
+      numbered_list_item:
+        $ref: "#/components/ListItemInput"
+      to_do:
+        $ref: "#/components/ToDoInput"
+      toggle:
+        $ref: "#/components/ToggleInput"
+      code:
+        $ref: "#/components/CodeInput"
+      quote:
+        $ref: "#/components/QuoteInput"
+      callout:
+        $ref: "#/components/CalloutInput"
+      divider:
+        type: object
+      table_of_contents:
+        type: object
+      image:
+        $ref: "#/components/FileInput"
+      video:
+        $ref: "#/components/FileInput"
+      file:
+        $ref: "#/components/FileInput"
+      pdf:
+        $ref: "#/components/FileInput"
+      bookmark:
+        $ref: "#/components/BookmarkInput"
+      embed:
+        $ref: "#/components/EmbedInput"
+
+  ParagraphInput:
+    type: object
+    properties:
+      rich_text:
+        type: array
+        items:
+          $ref: "#/components/RichText"
+      color:
+        type: string
+      children:
+        type: array
+        description: Nested blocks
+
+  HeadingInput:
+    type: object
+    properties:
+      rich_text:
+        type: array
+        items:
+          $ref: "#/components/RichText"
+      color:
+        type: string
+      is_toggleable:
+        type: boolean
+
+  ListItemInput:
+    type: object
+    properties:
+      rich_text:
+        type: array
+        items:
+          $ref: "#/components/RichText"
+      color:
+        type: string
+      children:
+        type: array
+
+  ToDoInput:
+    type: object
+    properties:
+      rich_text:
+        type: array
+        items:
+          $ref: "#/components/RichText"
+      checked:
+        type: boolean
+        default: false
+      color:
+        type: string
+      children:
+        type: array
+
+  ToggleInput:
+    type: object
+    properties:
+      rich_text:
+        type: array
+        items:
+          $ref: "#/components/RichText"
+      color:
+        type: string
+      children:
+        type: array
+        description: Blocks inside the toggle
+
+  CodeInput:
+    type: object
+    properties:
+      rich_text:
+        type: array
+        items:
+          $ref: "#/components/RichText"
+      caption:
+        type: array
+      language:
+        type: string
+        enum:
+          - abap
+          - arduino
+          - bash
+          - basic
+          - c
+          - clojure
+          - coffeescript
+          - cpp
+          - csharp
+          - css
+          - dart
+          - diff
+          - docker
+          - elixir
+          - elm
+          - erlang
+          - flow
+          - fortran
+          - fsharp
+          - gherkin
+          - glsl
+          - go
+          - graphql
+          - groovy
+          - haskell
+          - html
+          - java
+          - javascript
+          - json
+          - julia
+          - kotlin
+          - latex
+          - less
+          - lisp
+          - livescript
+          - lua
+          - makefile
+          - markdown
+          - markup
+          - matlab
+          - mermaid
+          - nix
+          - objective-c
+          - ocaml
+          - pascal
+          - perl
+          - php
+          - plain text
+          - powershell
+          - prolog
+          - protobuf
+          - python
+          - r
+          - reason
+          - ruby
+          - rust
+          - sass
+          - scala
+          - scheme
+          - scss
+          - shell
+          - sql
+          - swift
+          - typescript
+          - vb.net
+          - verilog
+          - vhdl
+          - visual basic
+          - webassembly
+          - xml
+          - yaml
+          - java/c/c++/c#
+
+  QuoteInput:
+    type: object
+    properties:
+      rich_text:
+        type: array
+        items:
+          $ref: "#/components/RichText"
+      color:
+        type: string
+      children:
+        type: array
+
+  CalloutInput:
+    type: object
+    properties:
+      rich_text:
+        type: array
+        items:
+          $ref: "#/components/RichText"
+      icon:
+        type: object
+        oneOf:
+          - properties:
+              type:
+                const: emoji
+              emoji:
+                type: string
+          - properties:
+              type:
+                const: external
+              external:
+                type: object
+      color:
+        type: string
+      children:
+        type: array
+
+  FileInput:
+    type: object
+    oneOf:
+      - properties:
+          type:
+            const: external
+          external:
+            type: object
+            properties:
+              url:
+                type: string
+                format: uri
+      - properties:
+          type:
+            const: file
+          file:
+            type: object
+            properties:
+              url:
+                type: string
+                format: uri
+
+  BookmarkInput:
+    type: object
+    properties:
+      url:
+        type: string
+        format: uri
+      caption:
+        type: array
+        items:
+          $ref: "#/components/RichText"
+
+  EmbedInput:
+    type: object
+    properties:
+      url:
+        type: string
+        format: uri
+
+  RichText:
+    type: object
+    properties:
+      type:
+        type: string
+        enum:
+          - text
+          - mention
+          - equation
+      text:
+        type: object
+        properties:
+          content:
+            type: string
+          link:
+            type: object
+            nullable: true
+            properties:
+              url:
+                type: string
+                format: uri
+      annotations:
+        type: object
+        properties:
+          bold:
+            type: boolean
+          italic:
+            type: boolean
+          strikethrough:
+            type: boolean
+          underline:
+            type: boolean
+          code:
+            type: boolean
+          color:
+            type: string
+      plain_text:
+        type: string
+      href:
+        type: string
+        format: uri
+        nullable: true

@@ -1,0 +1,275 @@
+# Notion Comments Skills
+# Agent skills for managing comments on Notion pages and blocks
+
+skills:
+  - id: notion/comments/create
+    name: Create Comment
+    description: >
+      Add a comment to a page or reply to an existing discussion thread.
+      Comments support rich text formatting including mentions and links.
+    tags:
+      - notion
+      - comments
+      - create
+      - collaboration
+    examples:
+      - "Add a comment saying 'Please review this section'"
+      - "Comment on this page with feedback"
+      - "Reply to this discussion thread"
+      - "Leave a note for the team about the deadline"
+      - "Mention @John in a comment about the budget"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: POST
+      path: /comments
+    parameters:
+      parent:
+        type: object
+        required: true
+        description: Page ID to comment on
+        properties:
+          page_id:
+            type: string
+            format: uuid
+            description: The page to add the comment to
+      discussion_id:
+        type: string
+        format: uuid
+        description: >
+          Existing discussion thread to reply to.
+          If not provided, creates a new discussion.
+      rich_text:
+        type: array
+        required: true
+        description: Comment content as rich text
+        items:
+          $ref: "#/components/RichText"
+    responses:
+      "200":
+        description: Comment created successfully
+        schema:
+          $ref: "#/components/Comment"
+      "400":
+        description: Bad request - invalid content
+      "401":
+        description: Unauthorized
+      "404":
+        description: Page or discussion not found
+      "429":
+        description: Rate limit exceeded
+
+  - id: notion/comments/list
+    name: List Comments
+    description: >
+      Retrieve all comments on a page or block.
+      Returns comments with pagination support.
+    tags:
+      - notion
+      - comments
+      - read
+      - list
+    examples:
+      - "Get all comments on this page"
+      - "Show me the discussion on this block"
+      - "List feedback comments on the proposal"
+      - "Get the latest comments"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: GET
+      path: /comments
+    parameters:
+      block_id:
+        type: string
+        format: uuid
+        required: true
+        in: query
+        description: Page or block ID to get comments for
+      page_size:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 100
+        in: query
+        description: Number of comments to return
+      start_cursor:
+        type: string
+        in: query
+        description: Pagination cursor from previous response
+    responses:
+      "200":
+        description: Comments retrieved successfully
+        schema:
+          type: object
+          properties:
+            object:
+              type: string
+              const: list
+            results:
+              type: array
+              items:
+                $ref: "#/components/Comment"
+            has_more:
+              type: boolean
+            next_cursor:
+              type: string
+              nullable: true
+            type:
+              type: string
+              const: comment
+      "400":
+        description: Bad request
+      "401":
+        description: Unauthorized
+      "429":
+        description: Rate limit exceeded
+
+  - id: notion/comments/retrieve
+    name: Retrieve Comment
+    description: >
+      Get a specific comment by its ID.
+    tags:
+      - notion
+      - comments
+      - read
+    examples:
+      - "Get the comment with ID xyz"
+      - "Fetch this specific comment"
+      - "Show me the details of this comment"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: GET
+      path: /comments/{comment_id}
+    parameters:
+      comment_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+        description: The unique identifier of the comment
+    responses:
+      "200":
+        description: Comment retrieved successfully
+        schema:
+          $ref: "#/components/Comment"
+      "400":
+        description: Bad request
+      "401":
+        description: Unauthorized
+      "404":
+        description: Comment not found
+      "429":
+        description: Rate limit exceeded
+
+components:
+  Comment:
+    type: object
+    properties:
+      object:
+        type: string
+        const: comment
+      id:
+        type: string
+        format: uuid
+      parent:
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+              - page_id
+              - block_id
+          page_id:
+            type: string
+            format: uuid
+          block_id:
+            type: string
+            format: uuid
+      discussion_id:
+        type: string
+        format: uuid
+        description: ID of the discussion thread this comment belongs to
+      created_time:
+        type: string
+        format: date-time
+      last_edited_time:
+        type: string
+        format: date-time
+      created_by:
+        $ref: "#/components/User"
+      rich_text:
+        type: array
+        items:
+          $ref: "#/components/RichText"
+
+  User:
+    type: object
+    properties:
+      object:
+        type: string
+        const: user
+      id:
+        type: string
+        format: uuid
+      type:
+        type: string
+        enum:
+          - person
+          - bot
+      name:
+        type: string
+        nullable: true
+      avatar_url:
+        type: string
+        format: uri
+        nullable: true
+
+  RichText:
+    type: object
+    properties:
+      type:
+        type: string
+        enum:
+          - text
+          - mention
+          - equation
+      text:
+        type: object
+        properties:
+          content:
+            type: string
+          link:
+            type: object
+            nullable: true
+      mention:
+        type: object
+        description: Mention of a user, page, database, or date
+      annotations:
+        type: object
+        properties:
+          bold:
+            type: boolean
+          italic:
+            type: boolean
+          strikethrough:
+            type: boolean
+          underline:
+            type: boolean
+          code:
+            type: boolean
+          color:
+            type: string
+      plain_text:
+        type: string
+      href:
+        type: string
+        format: uri
+        nullable: true

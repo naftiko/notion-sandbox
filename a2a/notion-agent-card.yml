@@ -1,0 +1,150 @@
+name: Notion Agent
+description: >-
+  An agent that provides access to Notion workspaces, enabling creation,
+  retrieval, and management of pages, databases, blocks, comments, and files.
+url: https://api.notion.com/v1
+provider:
+  organization: Notion
+  url: https://www.notion.so
+version: 1.1.0
+documentationUrl: https://developers.notion.com
+capabilities:
+  streaming: false
+  pushNotifications: true
+  stateTransitionHistory: false
+authentication:
+  schemes:
+    - bearer
+  credentials: OAuth 2.0 access token or internal integration token
+defaultInputModes:
+  - application/json
+defaultOutputModes:
+  - application/json
+skills:
+  - id: pages-management
+    name: Pages Management
+    description: >-
+      Create, retrieve, update, and move Notion pages with properties and
+      content blocks
+    tags:
+      - pages
+      - content
+      - crud
+    examples:
+      - Create a new page in my Projects database
+      - Update the status property of page X to Done
+      - Move page X under page Y
+      - Get the contents of my meeting notes page
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+  - id: databases-management
+    name: Databases Management
+    description: >-
+      Create, retrieve, update, and query Notion databases with schema
+      management
+    tags:
+      - databases
+      - schema
+      - query
+    examples:
+      - Create a new task tracking database
+      - Add a new Status property to my database
+      - Query all items where Status is In Progress
+      - Update the database title
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+  - id: blocks-management
+    name: Blocks Management
+    description: Create, retrieve, update, and delete content blocks within pages
+    tags:
+      - blocks
+      - content
+      - editing
+    examples:
+      - Add a paragraph to my page
+      - Insert a heading block
+      - Delete the third block on the page
+      - Get all child blocks of a page
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+  - id: comments-management
+    name: Comments Management
+    description: Create and retrieve comments on pages and blocks
+    tags:
+      - comments
+      - collaboration
+    examples:
+      - Add a comment to this page
+      - Get all comments on page X
+      - Reply to a discussion thread
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+  - id: search
+    name: Search
+    description: Search across pages and databases in the workspace
+    tags:
+      - search
+      - discovery
+    examples:
+      - Search for pages containing 'quarterly report'
+      - Find all databases in my workspace
+      - Search for recently edited pages
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+  - id: file-uploads
+    name: File Uploads
+    description: >-
+      Upload files to Notion, supporting single-part and multi-part uploads for
+      large files
+    tags:
+      - files
+      - uploads
+      - attachments
+    examples:
+      - Upload an image to Notion
+      - Upload a large video file
+      - Check the status of my file upload
+    inputModes:
+      - application/json
+      - multipart/form-data
+    outputModes:
+      - application/json
+  - id: users-management
+    name: Users Management
+    description: Retrieve information about users and bots in the workspace
+    tags:
+      - users
+      - workspace
+      - identity
+    examples:
+      - List all users in my workspace
+      - Get information about the current bot
+      - Find user by ID
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+  - id: data-sources
+    name: Data Sources Management
+    description: Create, retrieve, update, and query data sources
+    tags:
+      - data-sources
+      - integration
+    examples:
+      - Create a new data source
+      - Query data from a data source
+      - Update data source schema
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
