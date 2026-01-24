@@ -1,0 +1,227 @@
+# Notion Users Skills
+# Agent skills for retrieving user information in Notion workspaces
+
+skills:
+  - id: notion/users/list
+    name: List Users
+    description: >
+      Get all users (people and bots) in the workspace.
+      Returns paginated results including user names, emails, and avatars.
+    tags:
+      - notion
+      - users
+      - list
+      - workspace
+    examples:
+      - "List all users in the workspace"
+      - "Who has access to this workspace?"
+      - "Show me all team members"
+      - "Get all bots in the workspace"
+      - "List all people with access"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: GET
+      path: /users
+    parameters:
+      page_size:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 100
+        in: query
+        description: Number of users to return per page
+      start_cursor:
+        type: string
+        in: query
+        description: Pagination cursor from previous response
+    responses:
+      "200":
+        description: Users retrieved successfully
+        schema:
+          type: object
+          properties:
+            object:
+              type: string
+              const: list
+            results:
+              type: array
+              items:
+                $ref: "#/components/User"
+            has_more:
+              type: boolean
+            next_cursor:
+              type: string
+              nullable: true
+            type:
+              type: string
+              const: user
+      "400":
+        description: Bad request
+      "401":
+        description: Unauthorized
+      "429":
+        description: Rate limit exceeded
+      "500":
+        description: Internal server error
+
+  - id: notion/users/retrieve
+    name: Retrieve User
+    description: >
+      Get information about a specific user by ID.
+      Returns user details including name, email (for people), and avatar.
+    tags:
+      - notion
+      - users
+      - read
+    examples:
+      - "Get user with ID abc123"
+      - "Who is this user?"
+      - "Get details about this team member"
+      - "Look up user information"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: GET
+      path: /users/{user_id}
+    parameters:
+      user_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+        description: The unique identifier of the user
+    responses:
+      "200":
+        description: User retrieved successfully
+        schema:
+          $ref: "#/components/User"
+      "400":
+        description: Bad request
+      "401":
+        description: Unauthorized
+      "404":
+        description: User not found
+      "429":
+        description: Rate limit exceeded
+
+  - id: notion/users/me
+    name: Get Current Bot User
+    description: >
+      Get information about the bot user associated with the current access token.
+      Useful for identifying which integration is currently authenticated.
+    tags:
+      - notion
+      - users
+      - identity
+      - bot
+    examples:
+      - "Who am I?"
+      - "Get my bot information"
+      - "What integration is currently connected?"
+      - "Check my bot identity"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: GET
+      path: /users/me
+    parameters: {}
+    responses:
+      "200":
+        description: Bot user retrieved successfully
+        schema:
+          $ref: "#/components/BotUser"
+      "401":
+        description: Unauthorized
+      "429":
+        description: Rate limit exceeded
+
+components:
+  User:
+    type: object
+    properties:
+      object:
+        type: string
+        const: user
+      id:
+        type: string
+        format: uuid
+      type:
+        type: string
+        enum:
+          - person
+          - bot
+      name:
+        type: string
+        nullable: true
+        description: User's display name
+      avatar_url:
+        type: string
+        format: uri
+        nullable: true
+        description: URL of the user's avatar image
+      person:
+        type: object
+        description: Present only for person users
+        properties:
+          email:
+            type: string
+            format: email
+            description: User's email address
+      bot:
+        type: object
+        description: Present only for bot users
+        properties:
+          owner:
+            type: object
+            description: Owner of the bot (workspace or user)
+          workspace_name:
+            type: string
+            description: Name of the workspace
+
+  BotUser:
+    type: object
+    properties:
+      object:
+        type: string
+        const: user
+      id:
+        type: string
+        format: uuid
+      type:
+        type: string
+        const: bot
+      name:
+        type: string
+        nullable: true
+        description: Bot's name (from integration settings)
+      avatar_url:
+        type: string
+        format: uri
+        nullable: true
+      bot:
+        type: object
+        properties:
+          owner:
+            type: object
+            properties:
+              type:
+                type: string
+                enum:
+                  - workspace
+                  - user
+              workspace:
+                type: boolean
+                description: Present if owner type is workspace
+              user:
+                type: object
+                description: Present if owner type is user
+          workspace_name:
+            type: string
+            description: Name of the workspace the bot belongs to

@@ -1,0 +1,773 @@
+# Notion API Agent Skills - Complete Collection
+# All agent skills for the Notion API in a single file
+# Version: 1.1.0
+
+metadata:
+  name: Notion Agent Skills
+  description: Complete collection of agent skills for interacting with the Notion API
+  version: "1.1.0"
+  provider:
+    organization: Notion
+    url: https://www.notion.so
+  documentation: https://developers.notion.com
+  baseUrl: https://api.notion.com/v1
+
+authentication:
+  schemes:
+    - bearer
+  description: OAuth 2.0 access token or internal integration token
+
+# =============================================================================
+# PAGES SKILLS
+# =============================================================================
+pages:
+  - id: notion/pages/create
+    name: Create Page
+    description: Create a new Notion page within a database or as a child of another page
+    tags: [notion, pages, create, content]
+    examples:
+      - "Create a new page called 'Weekly Standup Notes' in my Meetings database"
+      - "Add a new task page with status 'To Do' and due date next Friday"
+      - "Create a page with a 🚀 emoji icon and a cover image"
+    endpoint:
+      method: POST
+      path: /pages
+    parameters:
+      parent:
+        type: object
+        required: true
+        description: Parent database_id or page_id
+      properties:
+        type: object
+        required: true
+        description: Property values
+      children:
+        type: array
+        description: Initial content blocks
+      icon:
+        type: object
+        description: Page icon (emoji or file)
+      cover:
+        type: object
+        description: Cover image
+
+  - id: notion/pages/retrieve
+    name: Retrieve Page
+    description: Get a Notion page by ID with all properties and metadata
+    tags: [notion, pages, read]
+    examples:
+      - "Get the page with ID abc123"
+      - "Fetch my project page details"
+    endpoint:
+      method: GET
+      path: /pages/{page_id}
+    parameters:
+      page_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+
+  - id: notion/pages/update
+    name: Update Page
+    description: Update page properties, icon, cover, or archive status
+    tags: [notion, pages, update]
+    examples:
+      - "Set the status of this task to 'Complete'"
+      - "Archive this page"
+    endpoint:
+      method: PATCH
+      path: /pages/{page_id}
+    parameters:
+      page_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+      properties:
+        type: object
+      archived:
+        type: boolean
+      icon:
+        type: object
+      cover:
+        type: object
+
+  - id: notion/pages/move
+    name: Move Page
+    description: Move a page to a new parent location
+    tags: [notion, pages, move]
+    examples:
+      - "Move this page under the Archive folder"
+      - "Transfer task to the Completed database"
+    endpoint:
+      method: POST
+      path: /pages/{page_id}/move
+    parameters:
+      page_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+      parent:
+        type: object
+        required: true
+
+  - id: notion/pages/get-property
+    name: Get Page Property
+    description: Retrieve a specific property value from a page
+    tags: [notion, pages, properties]
+    examples:
+      - "Get the Description property of this page"
+    endpoint:
+      method: GET
+      path: /pages/{page_id}/properties/{property_id}
+    parameters:
+      page_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+      property_id:
+        type: string
+        required: true
+        in: path
+
+# =============================================================================
+# DATABASES SKILLS
+# =============================================================================
+databases:
+  - id: notion/databases/create
+    name: Create Database
+    description: Create a new Notion database with a defined schema
+    tags: [notion, databases, create, schema]
+    examples:
+      - "Create a task tracker database with Status, Due Date, and Assignee"
+      - "Set up a CRM database with Company, Contact, and Deal Stage"
+    endpoint:
+      method: POST
+      path: /databases
+    parameters:
+      parent:
+        type: object
+        required: true
+      title:
+        type: array
+        required: true
+      properties:
+        type: object
+        required: true
+      icon:
+        type: object
+      cover:
+        type: object
+      is_inline:
+        type: boolean
+        default: false
+
+  - id: notion/databases/retrieve
+    name: Retrieve Database
+    description: Get a database's schema, properties, and metadata
+    tags: [notion, databases, read, schema]
+    examples:
+      - "Get the schema of my Projects database"
+      - "What properties does this database have?"
+    endpoint:
+      method: GET
+      path: /databases/{database_id}
+    parameters:
+      database_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+
+  - id: notion/databases/update
+    name: Update Database
+    description: Modify database title, description, or property schema
+    tags: [notion, databases, update, schema]
+    examples:
+      - "Add a new 'Priority' select property"
+      - "Rename the database to 'Q1 Projects'"
+    endpoint:
+      method: PATCH
+      path: /databases/{database_id}
+    parameters:
+      database_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+      title:
+        type: array
+      description:
+        type: array
+      properties:
+        type: object
+
+  - id: notion/databases/query
+    name: Query Database
+    description: Query a database with filters, sorts, and pagination
+    tags: [notion, databases, query, filter, search]
+    examples:
+      - "Get all tasks where Status is 'In Progress'"
+      - "Find items due this week sorted by priority"
+      - "Query for all completed projects from Q4"
+    endpoint:
+      method: POST
+      path: /databases/{database_id}/query
+    parameters:
+      database_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+      filter:
+        type: object
+        description: Filter conditions (supports AND/OR)
+      sorts:
+        type: array
+      start_cursor:
+        type: string
+      page_size:
+        type: integer
+        minimum: 1
+        maximum: 100
+
+# =============================================================================
+# BLOCKS SKILLS
+# =============================================================================
+blocks:
+  - id: notion/blocks/retrieve
+    name: Retrieve Block
+    description: Get a specific block by ID
+    tags: [notion, blocks, read]
+    examples:
+      - "Get the block with ID abc123"
+    endpoint:
+      method: GET
+      path: /blocks/{block_id}
+    parameters:
+      block_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+
+  - id: notion/blocks/get-children
+    name: Get Block Children
+    description: Retrieve all child blocks of a block or page
+    tags: [notion, blocks, read, children]
+    examples:
+      - "Get all content blocks from this page"
+      - "List the children of this toggle block"
+    endpoint:
+      method: GET
+      path: /blocks/{block_id}/children
+    parameters:
+      block_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+      page_size:
+        type: integer
+        maximum: 100
+        in: query
+      start_cursor:
+        type: string
+        in: query
+
+  - id: notion/blocks/append-children
+    name: Append Block Children
+    description: Add new content blocks to a page or existing block
+    tags: [notion, blocks, create, content]
+    examples:
+      - "Add a paragraph to my page"
+      - "Insert a to-do list with three items"
+      - "Append a code block with Python syntax"
+    endpoint:
+      method: PATCH
+      path: /blocks/{block_id}/children
+    parameters:
+      block_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+      children:
+        type: array
+        required: true
+        maxItems: 100
+
+  - id: notion/blocks/update
+    name: Update Block
+    description: Modify an existing block's content or archive it
+    tags: [notion, blocks, update, edit]
+    examples:
+      - "Update this paragraph text"
+      - "Check off this to-do item"
+    endpoint:
+      method: PATCH
+      path: /blocks/{block_id}
+    parameters:
+      block_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+      archived:
+        type: boolean
+
+  - id: notion/blocks/delete
+    name: Delete Block
+    description: Delete (archive) a block from a page
+    tags: [notion, blocks, delete]
+    examples:
+      - "Delete this paragraph"
+    endpoint:
+      method: DELETE
+      path: /blocks/{block_id}
+    parameters:
+      block_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+
+# =============================================================================
+# COMMENTS SKILLS
+# =============================================================================
+comments:
+  - id: notion/comments/create
+    name: Create Comment
+    description: Add a comment to a page or reply to an existing discussion
+    tags: [notion, comments, create, collaboration]
+    examples:
+      - "Add a comment saying 'Please review this section'"
+      - "Reply to this discussion thread"
+    endpoint:
+      method: POST
+      path: /comments
+    parameters:
+      parent:
+        type: object
+        required: true
+      discussion_id:
+        type: string
+        format: uuid
+      rich_text:
+        type: array
+        required: true
+
+  - id: notion/comments/list
+    name: List Comments
+    description: Retrieve all comments on a page or block
+    tags: [notion, comments, read, list]
+    examples:
+      - "Get all comments on this page"
+    endpoint:
+      method: GET
+      path: /comments
+    parameters:
+      block_id:
+        type: string
+        format: uuid
+        required: true
+        in: query
+      page_size:
+        type: integer
+        maximum: 100
+        in: query
+      start_cursor:
+        type: string
+        in: query
+
+  - id: notion/comments/retrieve
+    name: Retrieve Comment
+    description: Get a specific comment by its ID
+    tags: [notion, comments, read]
+    examples:
+      - "Get the comment with ID xyz"
+    endpoint:
+      method: GET
+      path: /comments/{comment_id}
+    parameters:
+      comment_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+
+# =============================================================================
+# SEARCH SKILLS
+# =============================================================================
+search:
+  - id: notion/search
+    name: Search Workspace
+    description: Search across all pages and databases by title
+    tags: [notion, search, find, discover]
+    examples:
+      - "Search for 'quarterly report'"
+      - "Find all pages mentioning 'budget'"
+      - "Search for databases only"
+    endpoint:
+      method: POST
+      path: /search
+    parameters:
+      query:
+        type: string
+      filter:
+        type: object
+        properties:
+          value:
+            type: string
+            enum: [page, database]
+          property:
+            const: object
+      sort:
+        type: object
+        properties:
+          direction:
+            enum: [ascending, descending]
+          timestamp:
+            const: last_edited_time
+      start_cursor:
+        type: string
+      page_size:
+        type: integer
+        maximum: 100
+
+# =============================================================================
+# USERS SKILLS
+# =============================================================================
+users:
+  - id: notion/users/list
+    name: List Users
+    description: Get all users (people and bots) in the workspace
+    tags: [notion, users, list, workspace]
+    examples:
+      - "List all users in the workspace"
+      - "Who has access to this workspace?"
+    endpoint:
+      method: GET
+      path: /users
+    parameters:
+      page_size:
+        type: integer
+        maximum: 100
+        in: query
+      start_cursor:
+        type: string
+        in: query
+
+  - id: notion/users/retrieve
+    name: Retrieve User
+    description: Get information about a specific user by ID
+    tags: [notion, users, read]
+    examples:
+      - "Get user with ID abc123"
+    endpoint:
+      method: GET
+      path: /users/{user_id}
+    parameters:
+      user_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+
+  - id: notion/users/me
+    name: Get Current Bot User
+    description: Get information about the bot user for the current token
+    tags: [notion, users, identity, bot]
+    examples:
+      - "Who am I?"
+      - "Get my bot information"
+    endpoint:
+      method: GET
+      path: /users/me
+    parameters: {}
+
+# =============================================================================
+# FILE UPLOAD SKILLS
+# =============================================================================
+files:
+  - id: notion/files/initiate-upload
+    name: Initiate File Upload
+    description: Start a new file upload session
+    tags: [notion, files, upload]
+    examples:
+      - "Start an upload for company-logo.png"
+      - "Initiate upload for a 50MB video file"
+    endpoint:
+      method: POST
+      path: /file_uploads
+    parameters:
+      filename:
+        type: string
+        required: true
+        maxLength: 900
+      file_size_bytes:
+        type: integer
+        required: true
+        maximum: 5368709120
+      mime_type:
+        type: string
+      part_size_bytes:
+        type: integer
+        minimum: 5242880
+        maximum: 20971520
+
+  - id: notion/files/send-upload
+    name: Send File Upload
+    description: Upload file data using multipart/form-data
+    tags: [notion, files, upload]
+    examples:
+      - "Upload the file data for my image"
+    endpoint:
+      method: POST
+      path: /file_uploads/{file_upload_id}/send
+    inputModes: [multipart/form-data]
+    parameters:
+      file_upload_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+      file:
+        type: binary
+        required: true
+      part_number:
+        type: integer
+
+  - id: notion/files/complete-upload
+    name: Complete Multi-Part Upload
+    description: Finalize a multi-part upload
+    tags: [notion, files, upload, complete]
+    examples:
+      - "Complete my video upload"
+    endpoint:
+      method: POST
+      path: /file_uploads/{file_upload_id}/complete
+    parameters:
+      file_upload_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+      etags:
+        type: array
+        required: true
+
+  - id: notion/files/list-uploads
+    name: List File Uploads
+    description: Get a paginated list of file uploads
+    tags: [notion, files, list]
+    examples:
+      - "Show my recent file uploads"
+    endpoint:
+      method: GET
+      path: /file_uploads
+    parameters:
+      page_size:
+        type: integer
+        maximum: 100
+        in: query
+      start_cursor:
+        type: string
+        in: query
+
+  - id: notion/files/get-upload
+    name: Get File Upload Status
+    description: Check the status of a specific file upload
+    tags: [notion, files, status]
+    examples:
+      - "What's the status of my upload?"
+    endpoint:
+      method: GET
+      path: /file_uploads/{file_upload_id}
+    parameters:
+      file_upload_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+
+# =============================================================================
+# DATA SOURCES SKILLS
+# =============================================================================
+dataSources:
+  - id: notion/data-sources/create
+    name: Create Data Source
+    description: Create a new data source with defined properties
+    tags: [notion, data-sources, create]
+    examples:
+      - "Create a new data source called 'External CRM'"
+    endpoint:
+      method: POST
+      path: /data_sources
+    parameters:
+      name:
+        type: string
+        required: true
+      properties:
+        type: object
+        required: true
+
+  - id: notion/data-sources/retrieve
+    name: Retrieve Data Source
+    description: Get a data source by ID
+    tags: [notion, data-sources, read]
+    examples:
+      - "Get the External CRM data source"
+    endpoint:
+      method: GET
+      path: /data_sources/{data_source_id}
+    parameters:
+      data_source_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+
+  - id: notion/data-sources/update
+    name: Update Data Source
+    description: Modify a data source's name or properties
+    tags: [notion, data-sources, update]
+    examples:
+      - "Rename the data source to 'Sales CRM'"
+    endpoint:
+      method: PATCH
+      path: /data_sources/{data_source_id}
+    parameters:
+      data_source_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+      name:
+        type: string
+      properties:
+        type: object
+
+  - id: notion/data-sources/query
+    name: Query Data Source
+    description: Query a data source with filters and sorting
+    tags: [notion, data-sources, query]
+    examples:
+      - "Query the CRM data source for active deals"
+    endpoint:
+      method: POST
+      path: /data_sources/{data_source_id}/query
+    parameters:
+      data_source_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+      filter:
+        type: object
+      sorts:
+        type: array
+      start_cursor:
+        type: string
+      page_size:
+        type: integer
+
+  - id: notion/data-sources/get-templates
+    name: Get Data Source Templates
+    description: Retrieve all page templates for a data source
+    tags: [notion, data-sources, templates]
+    examples:
+      - "List templates for this data source"
+    endpoint:
+      method: GET
+      path: /data_sources/{data_source_id}/templates
+    parameters:
+      data_source_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+      page_size:
+        type: integer
+        maximum: 100
+        in: query
+      start_cursor:
+        type: string
+        in: query
+
+# =============================================================================
+# AUTHENTICATION SKILLS
+# =============================================================================
+auth:
+  - id: notion/auth/exchange-token
+    name: Exchange Authorization Code
+    description: Exchange OAuth authorization code for access token
+    tags: [notion, auth, oauth, token]
+    examples:
+      - "Exchange auth code for access token"
+    endpoint:
+      method: POST
+      path: /oauth/token
+    parameters:
+      grant_type:
+        type: string
+        required: true
+        const: authorization_code
+      code:
+        type: string
+        required: true
+      redirect_uri:
+        type: string
+        format: uri
+        required: true
+
+  - id: notion/auth/introspect-token
+    name: Introspect Token
+    description: Get information about the current access token
+    tags: [notion, auth, token, introspect]
+    examples:
+      - "Check my token status"
+      - "Is my token still valid?"
+    endpoint:
+      method: POST
+      path: /oauth/token/introspect
+    parameters:
+      token:
+        type: string
+        required: true
+
+  - id: notion/auth/refresh-token
+    name: Refresh Token
+    description: Get a new access token using a refresh token
+    tags: [notion, auth, token, refresh]
+    examples:
+      - "Refresh my access token"
+    endpoint:
+      method: POST
+      path: /oauth/token/refresh
+    parameters:
+      grant_type:
+        type: string
+        required: true
+        const: refresh_token
+      refresh_token:
+        type: string
+        required: true
+
+  - id: notion/auth/revoke-token
+    name: Revoke Token
+    description: Revoke an access token to end a session
+    tags: [notion, auth, token, revoke]
+    examples:
+      - "Revoke my access token"
+      - "Log out of Notion"
+    endpoint:
+      method: POST
+      path: /oauth/token/revoke
+    parameters:
+      token:
+        type: string
+        required: true

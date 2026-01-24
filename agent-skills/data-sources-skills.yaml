@@ -1,0 +1,314 @@
+# Notion Data Sources Skills
+# Agent skills for managing external data sources in Notion
+
+skills:
+  - id: notion/data-sources/create
+    name: Create Data Source
+    description: >
+      Create a new data source with defined properties.
+      Data sources allow integrating external data into Notion.
+    tags:
+      - notion
+      - data-sources
+      - create
+      - integration
+    examples:
+      - "Create a new data source called 'External CRM'"
+      - "Set up a data source for syncing inventory"
+      - "Create a data source with custom properties"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: POST
+      path: /data_sources
+    parameters:
+      name:
+        type: string
+        required: true
+        description: Name of the data source
+      properties:
+        type: object
+        required: true
+        description: Property definitions for the data source
+        additionalProperties: true
+    responses:
+      "200":
+        description: Data source created successfully
+        schema:
+          $ref: "#/components/DataSource"
+      "400":
+        description: Bad request - invalid parameters
+      "401":
+        description: Unauthorized
+      "429":
+        description: Rate limit exceeded
+
+  - id: notion/data-sources/retrieve
+    name: Retrieve Data Source
+    description: >
+      Get a data source by ID, including its properties and metadata.
+    tags:
+      - notion
+      - data-sources
+      - read
+    examples:
+      - "Get the External CRM data source"
+      - "Fetch data source details"
+      - "Show data source schema"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: GET
+      path: /data_sources/{data_source_id}
+    parameters:
+      data_source_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+        description: The unique identifier of the data source
+    responses:
+      "200":
+        description: Data source retrieved successfully
+        schema:
+          $ref: "#/components/DataSource"
+      "401":
+        description: Unauthorized
+      "404":
+        description: Data source not found
+      "429":
+        description: Rate limit exceeded
+
+  - id: notion/data-sources/update
+    name: Update Data Source
+    description: >
+      Modify a data source's name or properties.
+    tags:
+      - notion
+      - data-sources
+      - update
+    examples:
+      - "Rename the data source to 'Sales CRM'"
+      - "Add a new property to the data source"
+      - "Update data source schema"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: PATCH
+      path: /data_sources/{data_source_id}
+    parameters:
+      data_source_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+        description: The unique identifier of the data source
+      name:
+        type: string
+        description: New name for the data source
+      properties:
+        type: object
+        description: Property updates
+        additionalProperties: true
+    responses:
+      "200":
+        description: Data source updated successfully
+        schema:
+          $ref: "#/components/DataSource"
+      "400":
+        description: Bad request
+      "404":
+        description: Data source not found
+      "429":
+        description: Rate limit exceeded
+
+  - id: notion/data-sources/query
+    name: Query Data Source
+    description: >
+      Query a data source with filters and sorting.
+      Retrieve records matching specific criteria.
+    tags:
+      - notion
+      - data-sources
+      - query
+      - filter
+    examples:
+      - "Query the CRM data source for active deals"
+      - "Get all records from the inventory data source"
+      - "Find items matching criteria in the external source"
+      - "Search data source with filters"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: POST
+      path: /data_sources/{data_source_id}/query
+    parameters:
+      data_source_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+        description: The unique identifier of the data source
+      filter:
+        type: object
+        description: Filter conditions for the query
+        additionalProperties: true
+      sorts:
+        type: array
+        description: Sort order for results
+        items:
+          type: object
+          properties:
+            property:
+              type: string
+              description: Property to sort by
+            direction:
+              type: string
+              enum:
+                - ascending
+                - descending
+      start_cursor:
+        type: string
+        description: Pagination cursor
+      page_size:
+        type: integer
+        minimum: 1
+        maximum: 100
+        description: Number of results to return
+    responses:
+      "200":
+        description: Query executed successfully
+        schema:
+          type: object
+          properties:
+            object:
+              type: string
+              const: list
+            results:
+              type: array
+              items:
+                type: object
+            next_cursor:
+              type: string
+              nullable: true
+            has_more:
+              type: boolean
+      "400":
+        description: Bad request - invalid query
+      "404":
+        description: Data source not found
+      "429":
+        description: Rate limit exceeded
+
+  - id: notion/data-sources/get-templates
+    name: Get Data Source Templates
+    description: >
+      Retrieve all page templates available for a data source.
+      Templates can be used when creating new pages in the data source.
+    tags:
+      - notion
+      - data-sources
+      - templates
+    examples:
+      - "List templates for this data source"
+      - "What templates are available?"
+      - "Get all page templates"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: GET
+      path: /data_sources/{data_source_id}/templates
+    parameters:
+      data_source_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+        description: The unique identifier of the data source
+      page_size:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 100
+        in: query
+        description: Number of templates to return
+      start_cursor:
+        type: string
+        in: query
+        description: Pagination cursor
+    responses:
+      "200":
+        description: Templates retrieved successfully
+        schema:
+          type: object
+          properties:
+            object:
+              type: string
+              const: list
+            results:
+              type: array
+              items:
+                $ref: "#/components/Template"
+            has_more:
+              type: boolean
+            next_cursor:
+              type: string
+              format: uuid
+              nullable: true
+            type:
+              type: string
+              const: template
+      "400":
+        description: Bad request
+      "401":
+        description: Unauthorized
+      "403":
+        description: Forbidden
+      "404":
+        description: Data source not found
+      "429":
+        description: Rate limit exceeded
+      "500":
+        description: Internal server error
+
+components:
+  DataSource:
+    type: object
+    properties:
+      object:
+        type: string
+        const: datasource
+      id:
+        type: string
+        format: uuid
+      name:
+        type: string
+        description: Name of the data source
+      properties:
+        type: object
+        description: Property schema
+        additionalProperties: true
+
+  Template:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        description: Template ID
+      name:
+        type: string
+        description: Template name
+      is_default:
+        type: boolean
+        description: Whether this is the default template

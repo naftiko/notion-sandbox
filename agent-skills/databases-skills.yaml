@@ -1,0 +1,551 @@
+# Notion Databases Skills
+# Agent skills for managing Notion databases
+
+skills:
+  - id: notion/databases/create
+    name: Create Database
+    description: >
+      Create a new Notion database with a defined schema of properties.
+      Supports all property types including title, text, number, select,
+      multi_select, date, checkbox, url, email, phone, formula, relation, rollup, and more.
+    tags:
+      - notion
+      - databases
+      - create
+      - schema
+    examples:
+      - "Create a task tracker database with Status, Due Date, and Assignee columns"
+      - "Set up a CRM database with Company, Contact, and Deal Stage properties"
+      - "Create an inventory database with Product Name, SKU, Quantity, and Price"
+      - "Build a reading list database with Title, Author, Status, and Rating"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: POST
+      path: /databases
+    parameters:
+      parent:
+        type: object
+        required: true
+        description: Parent page where the database will be created
+        properties:
+          type:
+            type: string
+            const: page_id
+          page_id:
+            type: string
+            format: uuid
+      title:
+        type: array
+        required: true
+        description: Database title as rich text
+        items:
+          $ref: "#/components/RichText"
+      properties:
+        type: object
+        required: true
+        description: >
+          Property schema definitions. Each key is the property name,
+          value defines the property type and configuration.
+        additionalProperties:
+          oneOf:
+            - $ref: "#/components/TitleProperty"
+            - $ref: "#/components/RichTextProperty"
+            - $ref: "#/components/NumberProperty"
+            - $ref: "#/components/SelectProperty"
+            - $ref: "#/components/MultiSelectProperty"
+            - $ref: "#/components/DateProperty"
+            - $ref: "#/components/CheckboxProperty"
+            - $ref: "#/components/UrlProperty"
+            - $ref: "#/components/EmailProperty"
+            - $ref: "#/components/PhoneProperty"
+            - $ref: "#/components/FormulaProperty"
+            - $ref: "#/components/RelationProperty"
+            - $ref: "#/components/RollupProperty"
+            - $ref: "#/components/StatusProperty"
+      icon:
+        type: object
+        description: Database icon
+      cover:
+        type: object
+        description: Database cover image
+      is_inline:
+        type: boolean
+        default: false
+        description: Whether the database is inline within its parent page
+    responses:
+      "200":
+        description: Database created successfully
+        schema:
+          $ref: "#/components/Database"
+      "400":
+        description: Bad request - invalid parameters
+      "401":
+        description: Unauthorized
+      "403":
+        description: Forbidden - insufficient permissions
+      "429":
+        description: Rate limit exceeded
+
+  - id: notion/databases/retrieve
+    name: Retrieve Database
+    description: >
+      Get a database's schema, properties, and metadata.
+    tags:
+      - notion
+      - databases
+      - read
+      - schema
+    examples:
+      - "Get the schema of my Projects database"
+      - "What properties does this database have?"
+      - "Show me the structure of the Tasks database"
+      - "List all columns in the Inventory database"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: GET
+      path: /databases/{database_id}
+    parameters:
+      database_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+        description: The unique identifier of the database
+    responses:
+      "200":
+        description: Database retrieved successfully
+        schema:
+          $ref: "#/components/Database"
+      "400":
+        description: Bad request
+      "401":
+        description: Unauthorized
+      "404":
+        description: Database not found
+      "429":
+        description: Rate limit exceeded
+
+  - id: notion/databases/update
+    name: Update Database
+    description: >
+      Modify a database's title, description, or property schema.
+      Add, update, or remove properties.
+    tags:
+      - notion
+      - databases
+      - update
+      - schema
+    examples:
+      - "Add a new 'Priority' select property with High, Medium, Low options"
+      - "Rename the database to 'Q1 Projects'"
+      - "Remove the 'Legacy Status' column"
+      - "Add a formula property that calculates days until due date"
+      - "Update the Status property to add a new 'Blocked' option"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: PATCH
+      path: /databases/{database_id}
+    parameters:
+      database_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+        description: The unique identifier of the database
+      title:
+        type: array
+        description: New title as rich text
+        items:
+          $ref: "#/components/RichText"
+      description:
+        type: array
+        description: New description as rich text
+        items:
+          $ref: "#/components/RichText"
+      properties:
+        type: object
+        description: >
+          Property schema updates. Set property value to null to remove it.
+        additionalProperties: true
+      icon:
+        type: object
+        nullable: true
+        description: New icon or null to remove
+      cover:
+        type: object
+        nullable: true
+        description: New cover or null to remove
+    responses:
+      "200":
+        description: Database updated successfully
+        schema:
+          $ref: "#/components/Database"
+      "400":
+        description: Bad request
+      "401":
+        description: Unauthorized
+      "404":
+        description: Database not found
+      "429":
+        description: Rate limit exceeded
+
+  - id: notion/databases/query
+    name: Query Database
+    description: >
+      Query a database with filters, sorts, and pagination.
+      Retrieve pages matching specific criteria.
+      Supports complex compound filters with AND/OR logic.
+    tags:
+      - notion
+      - databases
+      - query
+      - filter
+      - search
+    examples:
+      - "Get all tasks where Status is 'In Progress'"
+      - "Find items due this week sorted by priority"
+      - "Query for all completed projects from Q4"
+      - "Get the 10 most recently edited pages"
+      - "Find all items assigned to John with High priority"
+      - "Get tasks that are overdue and not completed"
+      - "Find pages where Title contains 'report' OR Status is 'Review'"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: POST
+      path: /databases/{database_id}/query
+    parameters:
+      database_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+        description: The unique identifier of the database to query
+      filter:
+        type: object
+        description: >
+          Filter conditions. Supports property filters and compound filters (AND/OR).
+        oneOf:
+          - $ref: "#/components/PropertyFilter"
+          - $ref: "#/components/CompoundFilter"
+      sorts:
+        type: array
+        description: Sort order by property or timestamp
+        items:
+          type: object
+          properties:
+            property:
+              type: string
+              description: Property name to sort by
+            timestamp:
+              type: string
+              enum:
+                - created_time
+                - last_edited_time
+            direction:
+              type: string
+              enum:
+                - ascending
+                - descending
+      start_cursor:
+        type: string
+        description: Pagination cursor from previous response
+      page_size:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 100
+        description: Number of results to return
+    responses:
+      "200":
+        description: Query executed successfully
+        schema:
+          type: object
+          properties:
+            object:
+              type: string
+              const: list
+            results:
+              type: array
+              items:
+                $ref: "#/components/Page"
+            has_more:
+              type: boolean
+            next_cursor:
+              type: string
+              nullable: true
+            type:
+              type: string
+              const: page
+      "400":
+        description: Bad request - invalid filter
+      "401":
+        description: Unauthorized
+      "404":
+        description: Database not found
+      "429":
+        description: Rate limit exceeded
+
+components:
+  Database:
+    type: object
+    properties:
+      object:
+        type: string
+        const: database
+      id:
+        type: string
+        format: uuid
+      created_time:
+        type: string
+        format: date-time
+      last_edited_time:
+        type: string
+        format: date-time
+      title:
+        type: array
+        items:
+          $ref: "#/components/RichText"
+      description:
+        type: array
+        items:
+          $ref: "#/components/RichText"
+      icon:
+        type: object
+        nullable: true
+      cover:
+        type: object
+        nullable: true
+      properties:
+        type: object
+        description: Database property schema
+      parent:
+        type: object
+      url:
+        type: string
+        format: uri
+      archived:
+        type: boolean
+      is_inline:
+        type: boolean
+
+  RichText:
+    type: object
+    properties:
+      type:
+        type: string
+        enum:
+          - text
+          - mention
+          - equation
+      plain_text:
+        type: string
+      text:
+        type: object
+        properties:
+          content:
+            type: string
+          link:
+            type: object
+            nullable: true
+
+  PropertyFilter:
+    type: object
+    properties:
+      property:
+        type: string
+        description: Property name to filter on
+      checkbox:
+        type: object
+      date:
+        type: object
+      files:
+        type: object
+      multi_select:
+        type: object
+      number:
+        type: object
+      people:
+        type: object
+      relation:
+        type: object
+      rich_text:
+        type: object
+      select:
+        type: object
+      status:
+        type: object
+      timestamp:
+        type: string
+
+  CompoundFilter:
+    type: object
+    oneOf:
+      - properties:
+          and:
+            type: array
+            items:
+              oneOf:
+                - $ref: "#/components/PropertyFilter"
+                - $ref: "#/components/CompoundFilter"
+      - properties:
+          or:
+            type: array
+            items:
+              oneOf:
+                - $ref: "#/components/PropertyFilter"
+                - $ref: "#/components/CompoundFilter"
+
+  TitleProperty:
+    type: object
+    properties:
+      title:
+        type: object
+
+  RichTextProperty:
+    type: object
+    properties:
+      rich_text:
+        type: object
+
+  NumberProperty:
+    type: object
+    properties:
+      number:
+        type: object
+        properties:
+          format:
+            type: string
+            enum:
+              - number
+              - number_with_commas
+              - percent
+              - dollar
+              - euro
+              - pound
+              - yen
+              - ruble
+              - rupee
+              - won
+              - yuan
+
+  SelectProperty:
+    type: object
+    properties:
+      select:
+        type: object
+        properties:
+          options:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                color:
+                  type: string
+
+  MultiSelectProperty:
+    type: object
+    properties:
+      multi_select:
+        type: object
+        properties:
+          options:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                color:
+                  type: string
+
+  DateProperty:
+    type: object
+    properties:
+      date:
+        type: object
+
+  CheckboxProperty:
+    type: object
+    properties:
+      checkbox:
+        type: object
+
+  UrlProperty:
+    type: object
+    properties:
+      url:
+        type: object
+
+  EmailProperty:
+    type: object
+    properties:
+      email:
+        type: object
+
+  PhoneProperty:
+    type: object
+    properties:
+      phone_number:
+        type: object
+
+  FormulaProperty:
+    type: object
+    properties:
+      formula:
+        type: object
+        properties:
+          expression:
+            type: string
+
+  RelationProperty:
+    type: object
+    properties:
+      relation:
+        type: object
+        properties:
+          database_id:
+            type: string
+            format: uuid
+          type:
+            type: string
+            enum:
+              - single_property
+              - dual_property
+
+  RollupProperty:
+    type: object
+    properties:
+      rollup:
+        type: object
+        properties:
+          relation_property_name:
+            type: string
+          rollup_property_name:
+            type: string
+          function:
+            type: string
+
+  StatusProperty:
+    type: object
+    properties:
+      status:
+        type: object
+        properties:
+          options:
+            type: array
+          groups:
+            type: array

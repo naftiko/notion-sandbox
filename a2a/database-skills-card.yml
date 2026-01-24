@@ -1,0 +1,51 @@
+id: notion-databases
+name: Notion Databases Skill
+description: Create, manage, and query Notion databases with full schema control
+tags:
+  - databases
+  - schema
+  - query
+  - notion
+examples:
+  - >-
+    Create a project tracking database with Status, Due Date, and Assignee
+    properties
+  - Query database for all items where Status equals 'In Progress'
+  - Add a new multi-select property called 'Tags'
+  - Update database title and description
+inputModes:
+  - application/json
+outputModes:
+  - application/json
+operations:
+  - name: createDatabase
+    description: Create a new database with defined schema
+    parameters:
+      parent:
+        type: object
+        required: true
+      title:
+        type: array
+        required: true
+      properties:
+        type: object
+        description: Database property schema
+        required: true
+  - name: retrieveDatabase
+    description: Get database schema and metadata
+    parameters:
+      database_id:
+        type: string
+        format: uuid
+        required: true
+  - name: updateDatabase
+    description: Update database title, description, or schema
+    parameters:
+      database_id:
+        type: string
+        format: uuid
+        required: true
+      title:
+        type: array
+      properties:
+        type: object

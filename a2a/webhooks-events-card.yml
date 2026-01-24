@@ -1,0 +1,37 @@
+id: notion-webhooks
+name: Notion Webhooks
+description: Real-time event notifications for changes in Notion workspace
+tags:
+  - webhooks
+  - events
+  - notifications
+  - notion
+supportedEvents:
+  - type: page.created
+    description: Triggered when a new page is created
+  - type: page.properties_updated
+    description: Triggered when page properties are modified
+  - type: page.content_updated
+    description: Triggered when page content blocks change
+  - type: page.moved
+    description: Triggered when a page is moved to a new parent
+  - type: page.deleted
+    description: Triggered when a page is moved to trash
+  - type: page.undeleted
+    description: Triggered when a page is restored from trash
+  - type: database.created
+    description: Triggered when a new database is created
+  - type: database.schema_updated
+    description: Triggered when database schema changes
+  - type: comment.created
+    description: Triggered when a comment is added
+  - type: comment.updated
+    description: Triggered when a comment is edited
+  - type: comment.deleted
+    description: Triggered when a comment is removed
+  - type: data_source.created
+    description: Triggered when a data source is created
+  - type: data_source.schema_updated
+    description: Triggered when data source schema changes
+authentication:
+  verification: X-Notion-Signature header with HMAC-SHA256

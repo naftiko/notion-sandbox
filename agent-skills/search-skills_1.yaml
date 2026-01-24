@@ -1,0 +1,223 @@
+# Notion Search Skills
+# Agent skills for searching across Notion workspaces
+
+skills:
+  - id: notion/search
+    name: Search Workspace
+    description: >
+      Search across all pages and databases in the workspace by title.
+      Supports filtering by object type (page or database) and sorting
+      by last edited time. Returns paginated results.
+    tags:
+      - notion
+      - search
+      - find
+      - discover
+    examples:
+      - "Search for 'quarterly report'"
+      - "Find all pages mentioning 'budget'"
+      - "Search for databases only"
+      - "Find recently edited pages containing 'project'"
+      - "Search for 'meeting notes' sorted by last edited"
+      - "Find all content related to 'product launch'"
+      - "List all databases in the workspace"
+      - "Search for pages edited today"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: POST
+      path: /search
+    parameters:
+      query:
+        type: string
+        description: >
+          Search text to match in page and database titles.
+          Leave empty to return all accessible objects.
+      filter:
+        type: object
+        description: Filter results by object type
+        properties:
+          value:
+            type: string
+            enum:
+              - page
+              - database
+            description: Type of object to search for
+          property:
+            type: string
+            const: object
+            description: Must be "object" when filtering
+      sort:
+        type: object
+        description: Sort order for results
+        properties:
+          direction:
+            type: string
+            enum:
+              - ascending
+              - descending
+            default: descending
+            description: Sort direction
+          timestamp:
+            type: string
+            enum:
+              - last_edited_time
+            description: Property to sort by (only last_edited_time supported)
+      start_cursor:
+        type: string
+        description: Pagination cursor from previous response
+      page_size:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 100
+        description: Maximum number of results to return
+    responses:
+      "200":
+        description: Search executed successfully
+        schema:
+          type: object
+          properties:
+            object:
+              type: string
+              const: list
+            results:
+              type: array
+              description: Array of matching pages and/or databases
+              items:
+                oneOf:
+                  - $ref: "#/components/Page"
+                  - $ref: "#/components/Database"
+            has_more:
+              type: boolean
+              description: Whether there are more results available
+            next_cursor:
+              type: string
+              nullable: true
+              description: Cursor for fetching the next page of results
+            type:
+              type: string
+              const: page_or_database
+      "400":
+        description: Bad request - invalid parameters
+      "401":
+        description: Unauthorized - invalid or missing authentication
+      "429":
+        description: Rate limit exceeded
+
+components:
+  Page:
+    type: object
+    properties:
+      object:
+        type: string
+        const: page
+      id:
+        type: string
+        format: uuid
+      created_time:
+        type: string
+        format: date-time
+      created_by:
+        $ref: "#/components/User"
+      last_edited_time:
+        type: string
+        format: date-time
+      last_edited_by:
+        $ref: "#/components/User"
+      archived:
+        type: boolean
+      icon:
+        type: object
+        nullable: true
+      cover:
+        type: object
+        nullable: true
+      properties:
+        type: object
+        description: Page property values
+      parent:
+        type: object
+        description: Parent page, database, or workspace
+      url:
+        type: string
+        format: uri
+      public_url:
+        type: string
+        format: uri
+        nullable: true
+
+  Database:
+    type: object
+    properties:
+      object:
+        type: string
+        const: database
+      id:
+        type: string
+        format: uuid
+      created_time:
+        type: string
+        format: date-time
+      created_by:
+        $ref: "#/components/User"
+      last_edited_time:
+        type: string
+        format: date-time
+      last_edited_by:
+        $ref: "#/components/User"
+      title:
+        type: array
+        items:
+          $ref: "#/components/RichText"
+      description:
+        type: array
+        items:
+          $ref: "#/components/RichText"
+      icon:
+        type: object
+        nullable: true
+      cover:
+        type: object
+        nullable: true
+      properties:
+        type: object
+        description: Database property schema
+      parent:
+        type: object
+      url:
+        type: string
+        format: uri
+      archived:
+        type: boolean
+      is_inline:
+        type: boolean
+      public_url:
+        type: string
+        format: uri
+        nullable: true
+
+  User:
+    type: object
+    properties:
+      object:
+        type: string
+        const: user
+      id:
+        type: string
+        format: uuid
+
+  RichText:
+    type: object
+    properties:
+      type:
+        type: string
+      text:
+        type: object
+        properties:
+          content:
+            type: string
+      plain_text:
+        type: string

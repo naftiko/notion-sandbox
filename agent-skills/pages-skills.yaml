@@ -1,0 +1,341 @@
+# Notion Pages Skills
+# Agent skills for managing Notion pages
+
+skills:
+  - id: notion/pages/create
+    name: Create Page
+    description: >
+      Create a new Notion page within a database or as a child of another page.
+      Supports setting properties, content blocks, icons, and cover images.
+    tags:
+      - notion
+      - pages
+      - create
+      - content
+    examples:
+      - "Create a new page called 'Weekly Standup Notes' in my Meetings database"
+      - "Add a new task page with status 'To Do' and due date next Friday"
+      - "Create a page with a 🚀 emoji icon and a cover image"
+      - "Create a page with initial content including headings and paragraphs"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: POST
+      path: /pages
+    parameters:
+      parent:
+        type: object
+        required: true
+        description: Parent database_id or page_id where the page will be created
+        properties:
+          database_id:
+            type: string
+            format: uuid
+            description: ID of the parent database
+          page_id:
+            type: string
+            format: uuid
+            description: ID of the parent page
+      properties:
+        type: object
+        required: true
+        description: Property values matching the parent database schema
+      children:
+        type: array
+        description: Initial content blocks (paragraphs, headings, lists, etc.)
+        items:
+          $ref: "#/components/Block"
+      icon:
+        type: object
+        description: Emoji or external file for page icon
+        oneOf:
+          - type: object
+            properties:
+              type:
+                const: emoji
+              emoji:
+                type: string
+          - type: object
+            properties:
+              type:
+                const: external
+              external:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+      cover:
+        type: object
+        description: External file URL for page cover image
+        properties:
+          type:
+            const: external
+          external:
+            type: object
+            properties:
+              url:
+                type: string
+                format: uri
+    responses:
+      "200":
+        description: Page created successfully
+        schema:
+          $ref: "#/components/Page"
+      "400":
+        description: Bad request - invalid parameters
+      "401":
+        description: Unauthorized - invalid or missing authentication
+      "403":
+        description: Forbidden - insufficient permissions
+      "404":
+        description: Parent not found
+      "429":
+        description: Rate limit exceeded
+
+  - id: notion/pages/retrieve
+    name: Retrieve Page
+    description: >
+      Get a Notion page by ID, including all its properties and metadata.
+    tags:
+      - notion
+      - pages
+      - read
+      - retrieve
+    examples:
+      - "Get the page with ID abc123"
+      - "Fetch my project page details"
+      - "What are the properties of this page?"
+      - "Show me the metadata for the Q4 Planning page"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: GET
+      path: /pages/{page_id}
+    parameters:
+      page_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+        description: The unique identifier of the page
+    responses:
+      "200":
+        description: Page retrieved successfully
+        schema:
+          $ref: "#/components/Page"
+      "400":
+        description: Bad request
+      "401":
+        description: Unauthorized
+      "404":
+        description: Page not found
+      "429":
+        description: Rate limit exceeded
+
+  - id: notion/pages/update
+    name: Update Page
+    description: >
+      Update a page's properties, icon, cover, or archive status.
+      Cannot update page content directly (use blocks skills for that).
+    tags:
+      - notion
+      - pages
+      - update
+      - modify
+    examples:
+      - "Set the status of this task to 'Complete'"
+      - "Update the due date to next Monday"
+      - "Archive this page"
+      - "Change the page icon to a checkmark emoji"
+      - "Mark the priority as High"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: PATCH
+      path: /pages/{page_id}
+    parameters:
+      page_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+        description: The unique identifier of the page to update
+      properties:
+        type: object
+        description: Property values to update
+      archived:
+        type: boolean
+        description: Set to true to archive the page
+      icon:
+        type: object
+        description: New icon (emoji or file)
+        nullable: true
+      cover:
+        type: object
+        description: New cover image
+        nullable: true
+    responses:
+      "200":
+        description: Page updated successfully
+        schema:
+          $ref: "#/components/Page"
+      "400":
+        description: Bad request
+      "401":
+        description: Unauthorized
+      "404":
+        description: Page not found
+      "409":
+        description: Conflict - resource modified
+      "429":
+        description: Rate limit exceeded
+
+  - id: notion/pages/move
+    name: Move Page
+    description: >
+      Move a page to a new parent location (another page or database).
+    tags:
+      - notion
+      - pages
+      - move
+      - organize
+    examples:
+      - "Move this page under the Archive folder"
+      - "Transfer task to the Completed database"
+      - "Relocate meeting notes to the Q1 section"
+      - "Move page abc123 to be a child of page xyz789"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: POST
+      path: /pages/{page_id}/move
+    parameters:
+      page_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+        description: The unique identifier of the page to move
+      parent:
+        type: object
+        required: true
+        description: New parent (page_id or database_id)
+        properties:
+          type:
+            type: string
+            enum:
+              - page_id
+              - database_id
+          page_id:
+            type: string
+            format: uuid
+          database_id:
+            type: string
+            format: uuid
+    responses:
+      "200":
+        description: Page moved successfully
+        schema:
+          $ref: "#/components/Page"
+      "400":
+        description: Bad request
+      "404":
+        description: Page or parent not found
+      "429":
+        description: Rate limit exceeded
+
+  - id: notion/pages/get-property
+    name: Get Page Property
+    description: >
+      Retrieve a specific property value from a page.
+      Useful for paginated properties like rich text or relations.
+    tags:
+      - notion
+      - pages
+      - properties
+      - read
+    examples:
+      - "Get the Description property of this page"
+      - "Fetch all related items for this task"
+      - "What's the value of the Notes field?"
+      - "Get the full rich text content of the Summary property"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: GET
+      path: /pages/{page_id}/properties/{property_id}
+    parameters:
+      page_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+        description: The unique identifier of the page
+      property_id:
+        type: string
+        required: true
+        in: path
+        description: The property ID or name
+    responses:
+      "200":
+        description: Property retrieved successfully
+        schema:
+          $ref: "#/components/PropertyItem"
+      "404":
+        description: Page or property not found
+      "429":
+        description: Rate limit exceeded
+
+components:
+  Page:
+    type: object
+    properties:
+      object:
+        type: string
+        const: page
+      id:
+        type: string
+        format: uuid
+      created_time:
+        type: string
+        format: date-time
+      last_edited_time:
+        type: string
+        format: date-time
+      archived:
+        type: boolean
+      icon:
+        type: object
+        nullable: true
+      cover:
+        type: object
+        nullable: true
+      properties:
+        type: object
+      parent:
+        type: object
+      url:
+        type: string
+        format: uri
+
+  PropertyItem:
+    type: object
+    properties:
+      object:
+        type: string
+        const: property_item
+      id:
+        type: string
+      type:
+        type: string

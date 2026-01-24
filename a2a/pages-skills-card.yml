@@ -1,0 +1,68 @@
+id: notion-pages
+name: Notion Pages Skill
+description: >-
+  Full CRUD operations for Notion pages including properties, icons, covers, and
+  content
+tags:
+  - pages
+  - content
+  - properties
+  - notion
+examples:
+  - Create a page titled 'Meeting Notes' in database X
+  - 'Update page properties: set Status to Complete'
+  - Archive page with ID abc123
+  - Move page to a new parent
+inputModes:
+  - application/json
+outputModes:
+  - application/json
+operations:
+  - name: createPage
+    description: Create a new page with properties and optional content blocks
+    parameters:
+      parent:
+        type: object
+        description: Parent page or database reference
+        required: true
+      properties:
+        type: object
+        description: Page property values
+        required: true
+      children:
+        type: array
+        description: Content blocks to add to the page
+      icon:
+        type: object
+        description: Page icon (emoji or file)
+      cover:
+        type: object
+        description: Page cover image
+  - name: retrievePage
+    description: Get a page by its ID
+    parameters:
+      page_id:
+        type: string
+        format: uuid
+        required: true
+  - name: updatePage
+    description: Update page properties, icon, cover, or archive status
+    parameters:
+      page_id:
+        type: string
+        format: uuid
+        required: true
+      properties:
+        type: object
+      archived:
+        type: boolean
+  - name: movePage
+    description: Move a page to a new parent
+    parameters:
+      page_id:
+        type: string
+        format: uuid
+        required: true
+      parent:
+        type: object
+        required: true

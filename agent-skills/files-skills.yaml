@@ -1,0 +1,371 @@
+# Notion File Upload Skills
+# Agent skills for uploading and managing files in Notion
+
+skills:
+  - id: notion/files/initiate-upload
+    name: Initiate File Upload
+    description: >
+      Start a new file upload session. For files ≤20MB use single-part mode.
+      For larger files (up to 5GB), use multi-part mode by specifying part_size_bytes.
+    tags:
+      - notion
+      - files
+      - upload
+      - attachments
+    examples:
+      - "Start an upload for company-logo.png"
+      - "Initiate upload for a 50MB video file"
+      - "Prepare to upload a PDF document"
+      - "Create upload session for an image"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: POST
+      path: /file_uploads
+    parameters:
+      filename:
+        type: string
+        required: true
+        maxLength: 900
+        description: Name of the file including extension
+      file_size_bytes:
+        type: integer
+        required: true
+        minimum: 1
+        maximum: 5368709120
+        description: >
+          Total size of the file in bytes.
+          Max 5GB for paid workspaces, 5MB for free workspaces.
+      mime_type:
+        type: string
+        description: MIME type of the file
+        enum:
+          - image/gif
+          - image/heic
+          - image/jpeg
+          - image/png
+          - image/svg+xml
+          - image/tiff
+          - image/webp
+          - audio/aac
+          - audio/midi
+          - audio/mpeg
+          - audio/mp4
+          - audio/ogg
+          - audio/wav
+          - video/mp4
+          - video/webm
+          - video/quicktime
+          - video/mpeg
+          - application/pdf
+          - text/plain
+          - application/json
+          - application/msword
+          - application/vnd.openxmlformats-officedocument.wordprocessingml.document
+          - application/vnd.ms-excel
+          - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+          - application/vnd.ms-powerpoint
+          - application/vnd.openxmlformats-officedocument.presentationml.presentation
+      part_size_bytes:
+        type: integer
+        minimum: 5242880
+        maximum: 20971520
+        description: >
+          Size of each part for multi-part uploads.
+          Required if file_size_bytes > 20MB.
+          Must be between 5MB and 20MB.
+    responses:
+      "200":
+        description: Upload session created successfully
+        schema:
+          $ref: "#/components/FileUploadResponse"
+      "400":
+        description: Bad request - invalid parameters
+      "401":
+        description: Unauthorized
+      "403":
+        description: Forbidden - workspace limits exceeded
+      "429":
+        description: Rate limit exceeded
+
+  - id: notion/files/send-upload
+    name: Send File Upload
+    description: >
+      Upload file data to Notion using multipart/form-data.
+      For multi-part uploads, call this for each part with the part_number.
+    tags:
+      - notion
+      - files
+      - upload
+    examples:
+      - "Upload the file data for my image"
+      - "Send part 2 of my video upload"
+      - "Upload the PDF content"
+    inputModes:
+      - multipart/form-data
+    outputModes:
+      - application/json
+    endpoint:
+      method: POST
+      path: /file_uploads/{file_upload_id}/send
+    parameters:
+      file_upload_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+        description: The ID of the file upload session
+      file:
+        type: string
+        format: binary
+        required: true
+        description: The file data to upload
+      part_number:
+        type: integer
+        minimum: 1
+        description: >
+          Part number for multi-part uploads (starts at 1).
+          Not needed for single-part uploads.
+    responses:
+      "200":
+        description: File data uploaded successfully
+        schema:
+          $ref: "#/components/FileUploadObject"
+      "400":
+        description: Bad request
+      "401":
+        description: Unauthorized
+      "404":
+        description: Upload session not found
+      "413":
+        description: Payload too large - part exceeds maximum size
+      "429":
+        description: Rate limit exceeded
+
+  - id: notion/files/complete-upload
+    name: Complete Multi-Part Upload
+    description: >
+      Finalize a multi-part upload after all parts have been sent.
+      Provide the ETags returned from each part upload.
+    tags:
+      - notion
+      - files
+      - upload
+      - complete
+    examples:
+      - "Complete my video upload"
+      - "Finalize the multi-part upload"
+      - "Finish uploading the large file"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: POST
+      path: /file_uploads/{file_upload_id}/complete
+    parameters:
+      file_upload_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+        description: The ID of the file upload session
+      etags:
+        type: array
+        required: true
+        description: Array of ETags returned from each part upload, in order
+        items:
+          type: string
+    responses:
+      "200":
+        description: Multi-part upload completed successfully
+        schema:
+          $ref: "#/components/FileUploadResponse"
+      "400":
+        description: Bad request - missing or invalid ETags
+      "401":
+        description: Unauthorized
+      "429":
+        description: Rate limit exceeded
+
+  - id: notion/files/list-uploads
+    name: List File Uploads
+    description: >
+      Get a paginated list of file uploads for the integration.
+      Shows upload status and metadata.
+    tags:
+      - notion
+      - files
+      - list
+    examples:
+      - "Show my recent file uploads"
+      - "List all pending uploads"
+      - "Get upload history"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: GET
+      path: /file_uploads
+    parameters:
+      page_size:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 100
+        in: query
+        description: Number of results to return
+      start_cursor:
+        type: string
+        in: query
+        description: Pagination cursor
+    responses:
+      "200":
+        description: File uploads retrieved successfully
+        schema:
+          type: object
+          properties:
+            object:
+              type: string
+              const: list
+            results:
+              type: array
+              items:
+                $ref: "#/components/FileUploadResponse"
+            has_more:
+              type: boolean
+            next_cursor:
+              type: string
+              nullable: true
+      "401":
+        description: Unauthorized
+      "429":
+        description: Rate limit exceeded
+
+  - id: notion/files/get-upload
+    name: Get File Upload Status
+    description: >
+      Check the status of a specific file upload.
+      Returns details including status, filename, size, and download URL if complete.
+    tags:
+      - notion
+      - files
+      - status
+    examples:
+      - "What's the status of my upload?"
+      - "Is my file upload complete?"
+      - "Check upload progress"
+      - "Get the download URL for my uploaded file"
+    inputModes:
+      - application/json
+    outputModes:
+      - application/json
+    endpoint:
+      method: GET
+      path: /file_uploads/{file_upload_id}
+    parameters:
+      file_upload_id:
+        type: string
+        format: uuid
+        required: true
+        in: path
+        description: The ID of the file upload to check
+    responses:
+      "200":
+        description: File upload status retrieved
+        schema:
+          $ref: "#/components/FileUploadResponse"
+      "401":
+        description: Unauthorized
+      "404":
+        description: Upload not found
+      "429":
+        description: Rate limit exceeded
+
+components:
+  FileUploadResponse:
+    type: object
+    properties:
+      object:
+        type: string
+        const: file_upload
+      id:
+        type: string
+        format: uuid
+      filename:
+        type: string
+        description: Original filename
+      file_size_bytes:
+        type: integer
+        description: Total file size
+      mime_type:
+        type: string
+        description: MIME type of the file
+      status:
+        type: string
+        enum:
+          - pending
+          - uploading
+          - complete
+          - failed
+          - expired
+          - archived
+        description: Current status of the upload
+      created_time:
+        type: string
+        format: date-time
+      completed_time:
+        type: string
+        format: date-time
+        nullable: true
+        description: Time when upload was completed
+      expiry_time:
+        type: string
+        format: date-time
+        nullable: true
+        description: When the upload session expires
+      upload_url:
+        type: string
+        format: uri
+        nullable: true
+        description: URL to send file data to
+      url:
+        type: string
+        format: uri
+        nullable: true
+        description: >
+          Signed URL to access the completed file.
+          Expires after 1 hour.
+      etag:
+        type: string
+        nullable: true
+        description: ETag of uploaded part (for multi-part uploads)
+
+  FileUploadObject:
+    type: object
+    properties:
+      object:
+        type: string
+        const: file_upload
+      id:
+        type: string
+        format: uuid
+      created_time:
+        type: string
+        format: date-time
+      last_edited_time:
+        type: string
+        format: date-time
+      archived:
+        type: boolean
+      status:
+        type: string
+      filename:
+        type: string
+      content_type:
+        type: string
+      content_length:
+        type: string
