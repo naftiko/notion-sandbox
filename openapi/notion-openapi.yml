@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: Notion API
+  title: notion-api
   description: >
     This is the sandbox OpenAPI for the Notion API, providing a standardized interface describing the Notion API, complete with examples and extensions to mock with Microcks, which can be used wuth Bruno the open-suorce API client.
   version: 1.1.0
@@ -9,6 +9,11 @@ tags:
     description: Notion is an all-in-one workspace that combines notes, databases, wikis, project boards, and calendars into a single customizable platform for individuals and teams to organize their work.
   - name: Productivity
     description: Productivity apps are software tools designed to help individuals and teams work more efficiently by organizing tasks, managing time, facilitating collaboration, and streamlining workflows
+
+servers:
+
+  - url: http://localhost:8080/rest/notion-api/1.1.4
+    description: Sandbox
 
 paths:
 
